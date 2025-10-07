@@ -1,7 +1,8 @@
-import { User, Company, Job, JobApplication, Role, JobType } from '@prisma/client'
+// TODO: Uncomment after running migrations
+// import { User, Company, Job, JobApplication, Role, JobType } from '@prisma/client'
 
 // Types de base pour l'application
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean
   data?: T
   error?: string
@@ -23,8 +24,58 @@ export interface PaginatedResponse<T> {
   }
 }
 
-// Types des modèles Prisma
-export type { User, Company, Job, JobApplication, Role, JobType }
+// Types temporaires (seront remplacés par les types Prisma après migration)
+export type Role = 'USER' | 'RECRUITER' | 'ADMIN'
+export type JobType = 'CDI' | 'CDD' | 'Stage' | 'Freelance'
+
+export interface User {
+  id: string
+  firstname: string
+  lastname: string
+  email: string
+  phone?: string | null
+  password: string
+  role: Role
+  companyId?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Company {
+  id: string
+  compName: string
+  place: string
+  information?: string | null
+  website?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface Job {
+  id: string
+  title: string
+  type: JobType
+  shortDescription: string
+  description: string
+  salary?: number | null
+  location: string
+  companyId: string
+  createdBy: string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export interface JobApplication {
+  id: string
+  message: string
+  applicantName: string
+  applicantEmail: string
+  applicantPhone?: string | null
+  jobId: string
+  userId?: string | null
+  createdAt: Date
+  updatedAt: Date
+}
 
 // Types avec relations
 export type UserWithCompany = User & {

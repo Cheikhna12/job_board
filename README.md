@@ -123,10 +123,10 @@ npx prisma db seed   # Peuple la base avec des données de test
 - [x] Setup du projet Next.js
 - [x] Configuration Prisma
 - [x] Structure des dossiers
-- [ ] Modèles de données Prisma
+- [x] Modèles de données Prisma
 
 ### Phase 2 : Authentification
-- [ ] Configuration NextAuth.js
+- [x] Configuration NextAuth.js
 - [ ] Pages de connexion/inscription
 - [ ] Middleware de protection des routes
 
