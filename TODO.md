@@ -1,4 +1,4 @@
-# 📋 TODO - Job Board
+# TODO - Job Board
 
 ## ✅ Terminé (Hamed)
 
@@ -65,7 +65,7 @@
 - [ ] Filtres par localisation/salaire
 - [ ] Dashboard avec statistiques
 
-## 🛠️ Comment Démarrer
+##  Comment Démarrer
 
 ### 1. Installation
 ```bash
@@ -91,12 +91,5 @@ export async function GET() {
 }
 ```
 
-## 🤝 Répartition Suggérée
-
-**Personne A**: APIs Jobs + Companies
-**Personne B**: APIs Applications + Users  
-**Personne C**: Pages Frontend (jobs, profile)
-**Personne D**: Pages Admin + Dashboard
-
 ## 📞 Contact
-Questions ? Demander à Hamed pour l'auth ou la structure.
+Questions ? Demander à Cheikhna pour l'auth ou la structure.
