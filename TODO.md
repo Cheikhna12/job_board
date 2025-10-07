@@ -1,6 +1,6 @@
 # TODO - Job Board
 
-## ✅ Terminé (Hamed)
+## ✅ Terminé (Cheikhna)
 
 ### Authentification & Base
 - [x] Configuration NextAuth.js + Prisma
