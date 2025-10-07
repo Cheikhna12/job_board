@@ -1,10 +1,10 @@
 # TODO - Job Board
 
-## ✅ Terminé (Cheikhna)
+## ✅ Terminé 
 
 ### Authentification & Base
 - [x] Configuration NextAuth.js + Prisma
-- [x] Pages login/register avec design moderne
+- [x] Pages login/register
 - [x] Middleware de protection des routes
 - [x] Gestion des rôles (USER/RECRUITER/ADMIN)
 - [x] Page d'accueil avec message de bienvenue
