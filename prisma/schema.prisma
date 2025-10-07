@@ -10,5 +10,96 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// TODO: Ajouter les modèles de données ici
-// Voir le fichier ARCHITECTURE.md pour les détails des modèles
+enum Role {
+  USER
+  RECRUITER
+  ADMIN
+}
+
+enum JobType {
+  CDI
+  CDD
+  Stage
+  Freelance
+}
+
+model Company {
+  id          String   @id @default(cuid())
+  compName    String
+  place       String
+  information String?  @db.Text
+  website     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  users       User[]   // Recruteurs de l'entreprise
+  jobs        Job[]    // Offres d'emploi de l'entreprise
+  
+  @@map("companies")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  firstname String
+  lastname  String
+  email     String   @unique
+  phone     String?
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relation optionnelle avec Company (pour les recruteurs)
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  
+  // Relations
+  jobApplications JobApplication[] // Candidatures de l'utilisateur
+  createdJobs     Job[]           // Offres créées par l'utilisateur (recruteur/admin)
+  
+  @@map("users")
+}
+
+model Job {
+  id               String   @id @default(cuid())
+  title            String
+  type             JobType
+  shortDescription String   @db.Text
+  description      String   @db.Text
+  salary           Float?
+  location         String
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+  
+  // Relations
+  companyId String
+  company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  
+  createdBy String
+  creator   User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
+  
+  jobApplications JobApplication[]
+  
+  @@map("jobs")
+}
+
+model JobApplication {
+  id             String   @id @default(cuid())
+  message        String   @db.Text
+  applicantName  String
+  applicantEmail String
+  applicantPhone String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  // Relation optionnelle avec User (pour les candidatures authentifiées)
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  
+  @@map("job_applications")
+}
