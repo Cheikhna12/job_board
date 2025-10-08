@@ -22,11 +22,11 @@
 **Priorité: HAUTE**
 
 #### Jobs API
-- [ ] `GET /api/jobs` - Liste des offres
-- [ ] `GET /api/jobs/[id]` - Détails offre
-- [ ] `POST /api/jobs` - Créer offre (RECRUITER/ADMIN)
-- [ ] `PUT /api/jobs/[id]` - Modifier offre
-- [ ] `DELETE /api/jobs/[id]` - Supprimer offre
+- [x] `GET /api/jobs` - Liste des offres
+- [x] `GET /api/jobs/[id]` - Détails offre
+- [x] `POST /api/jobs` - Créer offre (RECRUITER/ADMIN)
+- [x] `PUT /api/jobs/[id]` - Modifier offre
+- [x] `DELETE /api/jobs/[id]` - Supprimer offre
 
 #### Companies API  
 - [ ] `GET /api/companies` - Liste entreprises
@@ -42,8 +42,8 @@
 **Priorité: MOYENNE**
 
 #### Pages Publiques
-- [ ] `/jobs` - Liste des offres d'emploi
-- [ ] `/jobs/[id]` - Détails d'une offre
+- [x] `/jobs` - Liste des offres d'emploi
+- [x] `/jobs/[id]` - Détails d'une offre
 - [ ] `/companies` - Liste des entreprises
 
 #### Pages Utilisateur
