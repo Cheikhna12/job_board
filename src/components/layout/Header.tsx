@@ -25,12 +25,20 @@ export default function Header() {
                   Bonjour, {session.user.name}
                 </span>
                 {(session.user.role === 'ADMIN' || session.user.role === 'RECRUITER') && (
-                  <Link
-                    href="/admin"
-                    className="text-sm text-blue-600 hover:text-blue-500"
-                  >
-                    Administration
-                  </Link>
+                  <>
+                    <Link
+                      href="/admin"
+                      className="text-sm text-blue-600 hover:text-blue-500"
+                    >
+                      Administration
+                    </Link>
+                    <Link
+                      href="/api-docs"
+                      className="text-sm text-green-600 hover:text-green-500"
+                    >
+                      API Docs
+                    </Link>
+                  </>
                 )}
                 <button
                   onClick={() => signOut()}

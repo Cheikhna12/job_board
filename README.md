@@ -5,46 +5,16 @@ Une plateforme moderne de gestion d'offres d'emploi construite avec Next.js 14+,
 ## Prérequis
 
 Avant de commencer, assurez-vous d'avoir installé :
-
-- **Node.js** (version 18 ou supérieure)
-- **npm** ou **yarn**
-- **PostgreSQL** (version 12 ou supérieure)
-- **Git**
-
-## Installation et Configuration
-
-### 1. Cloner le projet
-
 ```bash
-git clone <url-du-repo>
+git clone [url-du-repo]
 cd job-board
-```
-
-### 2. Installer les dépendances
-
-```bash
 npm install
 ```
 
-### 3. Configuration de la base de données
-
-1. Créez une base de données PostgreSQL :
-```sql
-CREATE DATABASE job_board;
-```
-
-2. Copiez le fichier d'environnement :
+2. **Configurer la base de données**
 ```bash
-cp env.example .env
-```
-
-3. Modifiez le fichier `.env` avec vos informations :
-```env
-DATABASE_URL="postgresql://votre_user:votre_password@localhost:5432/job_board"
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="votre-clé-secrète-très-longue-et-sécurisée"
-```
-
+cp .env.example .env.local
+# Configurer DATABASE_URL dans .env.local
 ### 4. Configuration Prisma
 
 ```bash
@@ -127,12 +97,15 @@ npx prisma db seed   # Peuple la base avec des données de test
 
 ### Phase 2 : Authentification
 - [x] Configuration NextAuth.js
-- [ ] Pages de connexion/inscription
-- [ ] Middleware de protection des routes
+- [x] Pages de connexion/inscription
+- [x] Middleware de protection des routes
+- [x] Gestion des rôles (USER/RECRUITER/ADMIN)
+- [x] APIs Companies complètes
+- [x] Documentation Swagger UI
 
 ### Phase 3 : API et CRUD
 - [ ] Routes API pour les offres d'emploi
-- [ ] Routes API pour les entreprises
+- [x] Routes API pour les entreprises 
 - [ ] Routes API pour les candidatures
 - [ ] Routes API pour les utilisateurs
 
