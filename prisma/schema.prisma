@@ -11,8 +11,8 @@ datasource db {
 }
 
 enum Role {
-  APPLICANT
-  EMPLOYER
+  USER
+  RECRUITER
   ADMIN
 }
 

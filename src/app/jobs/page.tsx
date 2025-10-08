@@ -40,8 +40,7 @@ export default function JobsPage() {
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Liste des offres d’emploi</h1>
 
-      {/* Кнопка создания вакансии только для EMPLOYER/ADMIN */}
-      {(session?.user?.role === "EMPLOYER" || session?.user?.role === "ADMIN") && (
+      {(session?.user?.role === "RECRUITER" || session?.user?.role === "ADMIN") && (
         <div className="mb-6">
           <button
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
@@ -64,7 +63,6 @@ export default function JobsPage() {
               Entreprise: {job.company.compName} ({job.company.place})
             </p>
             <div className="mt-2 flex gap-2">
-              {/* Кнопка просмотра деталей для всех пользователей */}
               <button
                 className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700"
                 onClick={() => router.push(`/jobs/${job.id}`)}
@@ -72,8 +70,7 @@ export default function JobsPage() {
                 En savoir plus
               </button>
 
-              {/* Кнопки редактирования и удаления только для EMPLOYER/ADMIN */}
-              {(session?.user?.role === "EMPLOYER" || session?.user?.role === "ADMIN") && (
+              {(session?.user?.role === "RECRUITER" || session?.user?.role === "ADMIN") && (
                 <>
                   <button
                     className="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600"
@@ -92,6 +89,9 @@ export default function JobsPage() {
                   >
                     Supprimer
                   </button>
+                  
+
+                  
                 </>
               )}
             </div>
