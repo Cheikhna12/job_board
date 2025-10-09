@@ -19,7 +19,6 @@
 - **DELETE /api/jobs/[id]** - Suppression (RECRUITER/ADMIN)
 
 #### **Documentation Swagger UI**
-- Interface interactive complète
 - Documentation OpenAPI 3.0
 - Tests en direct des APIs
 - Schémas de données détaillés
@@ -29,7 +28,6 @@
 - Validation Zod pour toutes les entrées
 - Gestion des permissions par rôle
 - Protection des routes sensibles
-- Vérification de l'ownership des ressources
 
 ### **Améliorations Techniques**
 
@@ -50,8 +48,8 @@
 #### **APIs**
 - `src/app/api/companies/route.ts`
 - `src/app/api/companies/[id]/route.ts`
-- `src/app/api/jobs/route.ts` (du collègue)
-- `src/app/api/jobs/[id]/route.ts` (du collègue)
+- `src/app/api/jobs/route.ts`
+- `src/app/api/jobs/[id]/route.ts` 
 - `src/app/api/swagger/route.ts`
 
 #### **Documentation Swagger**
@@ -60,10 +58,10 @@
 - `src/lib/swagger-docs.ts`
 
 #### **Pages Frontend**
-- `src/app/jobs/page.tsx` (du collègue)
-- `src/app/jobs/[id]/page.tsx` (du collègue)
-- `src/app/jobs/[id]/edit/page.tsx` (du collègue)
-- `src/app/jobs/create/page.tsx` (du collègue)
+- `src/app/jobs/page.tsx`
+- `src/app/jobs/[id]/page.tsx` 
+- `src/app/jobs/[id]/edit/page.tsx` 
+- `src/app/jobs/create/page.tsx` 
 
 #### **Documentation**
 - `ARCHITECTURE_GUIDE.md`
@@ -129,7 +127,7 @@
 ## **Résumé Technique**
 
 ### **Stack Utilisé**
-- Next.js 15.5.4 (App Router)
+- Next.js (App Router)
 - TypeScript strict
 - Prisma ORM + PostgreSQL
 - NextAuth.js + JWT
@@ -147,7 +145,6 @@
 
 ### **Métriques**
 - **14 fichiers** créés/modifiés
-- **3545+ lignes** de code ajoutées
 - **10 endpoints** API documentés
 - **2 branches** mergées avec succès
 - **100%** des APIs testées
