@@ -26,10 +26,15 @@ const swaggerDefinition = {
       name: 'Jobs',
       description: 'Gestion des offres d\'emploi',
     },
+    {
+      name: 'Users',
+      description: 'Gestion des utilisateurs',
+    },
   ],
   components: {
     securitySchemes: {
       cookieAuth: {
+        type: 'apiKey',
         in: 'cookie',
         name: 'next-auth.session-token',
         description: 'Cookie de session NextAuth.js',
@@ -43,11 +48,27 @@ const swaggerDefinition = {
           firstname: { type: 'string', example: 'John' },
           lastname: { type: 'string', example: 'Doe' },
           email: { type: 'string', format: 'email', example: 'john.doe@example.com' },
-          phone: { type: 'string', example: '+33123456789' },
+          phone: { type: 'string', nullable: true, example: '+33123456789' },
           role: { type: 'string', enum: ['USER', 'RECRUITER', 'ADMIN'], example: 'USER' },
-          companyId: { type: 'string', nullable: true, example: 'cm1z8company123' },
           createdAt: { type: 'string', format: 'date-time' },
           updatedAt: { type: 'string', format: 'date-time' },
+          companyId: { type: 'string', nullable: true, example: 'cm1z8company123' },
+          company: {
+            type: 'object',
+            nullable: true,
+            properties: {
+              id: { type: 'string', example: 'cm1z8company123' },
+              compName: { type: 'string', example: 'TechCorp' },
+              place: { type: 'string', example: 'Paris, France' },
+            },
+          },
+          _count: {
+            type: 'object',
+            properties: {
+              jobApplications: { type: 'integer', example: 5 },
+              createdJobs: { type: 'integer', example: 3 },
+            },
+          },
         },
       },
       Company: {
@@ -119,48 +140,35 @@ const swaggerDefinition = {
           userId: { type: 'string', nullable: true, example: 'cm1z8user123' },
         },
       },
-      Application: {
+      ErrorResponse: {
         type: 'object',
         properties: {
-          id: { type: 'string', example: 'cm1z8app123' },
-          userId: { type: 'string', example: 'cm1z8user123' },
-          jobId: { type: 'string', example: 'cm1z8job123' },
-          status: { type: 'string', enum: ['PENDING', 'ACCEPTED', 'REJECTED'], example: 'PENDING' },
-          coverLetter: { type: 'string', example: 'Je suis très intéressé par ce poste...' },
-          createdAt: { type: 'string', format: 'date-time' },
-          updatedAt: { type: 'string', format: 'date-time' },
+          error: { type: 'string', example: 'Message d\'erreur' },
+          details: { type: 'array', items: { type: 'object' } },
         },
       },
-      ApiResponse: {
+      SuccessResponse: {
         type: 'object',
         properties: {
           success: { type: 'boolean', example: true },
+          data: { type: 'object' },
           message: { type: 'string', example: 'Opération réussie' },
-          error: { type: 'string', example: 'Message d\'erreur' },
         },
       },
       PaginatedResponse: {
         type: 'object',
         properties: {
           success: { type: 'boolean', example: true },
-          data: { type: 'array', items: {} },
+          data: { type: 'array', items: { type: 'object' } },
           pagination: {
             type: 'object',
             properties: {
               page: { type: 'integer', example: 1 },
               limit: { type: 'integer', example: 10 },
-              total: { type: 'integer', example: 25 },
-              pages: { type: 'integer', example: 3 },
+              total: { type: 'integer', example: 50 },
+              pages: { type: 'integer', example: 5 },
             },
           },
-        },
-      },
-      Error: {
-        type: 'object',
-        properties: {
-          success: { type: 'boolean', example: false },
-          error: { type: 'string', example: 'Message d\'erreur' },
-          details: { type: 'array', items: { type: 'object' } },
         },
       },
     },
@@ -175,8 +183,8 @@ const swaggerDefinition = {
 const options = {
   definition: swaggerDefinition,
   apis: [
-    './src/app/api/**/*.ts', // Chemins vers les fichiers API
-    './src/lib/swagger-docs.ts', // Documentation supplémentaire
+    './src/app/api/**/*.ts',
+    './src/lib/swagger-docs.ts',
   ],
 }
 

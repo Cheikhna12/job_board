@@ -120,6 +120,69 @@ DELETE /api/jobs/cm1z8example-job-id
 Cookie: next-auth.session-token=RECRUITER_TOKEN
 ```
 
+## Tests API Users
+
+### GET /api/users - Liste des utilisateurs (ADMIN seulement)
+```http
+GET /api/users?page=1&limit=10&search=john&role=USER
+Cookie: next-auth.session-token=ADMIN_TOKEN
+```
+
+### POST /api/users - Créer un utilisateur (ADMIN seulement)
+```http
+POST /api/users
+Content-Type: application/json
+Cookie: next-auth.session-token=ADMIN_TOKEN
+
+{
+  "firstname": "John",
+  "lastname": "Doe",
+  "email": "john.doe@example.com",
+  "phone": "+33123456789",
+  "password": "password123",
+  "role": "USER",
+  "companyId": "cm1z8company123"
+}
+```
+
+### GET /api/users/{id} - Détails d'un utilisateur
+```http
+GET /api/users/cm1z8example-user-id
+Cookie: next-auth.session-token=USER_TOKEN
+```
+
+### PUT /api/users/{id} - Modifier un utilisateur
+```http
+PUT /api/users/cm1z8example-user-id
+Content-Type: application/json
+Cookie: next-auth.session-token=USER_TOKEN
+
+{
+  "firstname": "John Updated",
+  "lastname": "Doe Updated",
+  "email": "john.updated@example.com",
+  "phone": "+33987654321"
+}
+```
+
+### PUT /api/users/{id} - Changer le rôle (ADMIN seulement)
+```http
+PUT /api/users/cm1z8example-user-id
+Content-Type: application/json
+Cookie: next-auth.session-token=ADMIN_TOKEN
+
+{
+  "role": "RECRUITER",
+  "companyId": "cm1z8company123"
+}
+```
+
+### DELETE /api/users/{id} - Supprimer un utilisateur (ADMIN seulement)
+```http
+DELETE /api/users/cm1z8example-user-id
+Cookie: next-auth.session-token=ADMIN_TOKEN
+```
+
 ## Réponses Attendues
 
 ### Succès - Liste des entreprises
@@ -178,6 +241,91 @@ Cookie: next-auth.session-token=RECRUITER_TOKEN
     }
   }
 ]
+```
+
+### Succès - Liste des utilisateurs (ADMIN)
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": "cm1z8user123",
+      "firstname": "John",
+      "lastname": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+33123456789",
+      "role": "USER",
+      "createdAt": "2024-01-01T00:00:00.000Z",
+      "updatedAt": "2024-01-01T00:00:00.000Z",
+      "companyId": null,
+      "company": null,
+      "_count": {
+        "jobApplications": 3,
+        "createdJobs": 0
+      }
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 15,
+    "pages": 2
+  }
+}
+```
+
+### Succès - Détails utilisateur avec relations
+```json
+{
+  "success": true,
+  "data": {
+    "id": "cm1z8user123",
+    "firstname": "John",
+    "lastname": "Doe",
+    "email": "john.doe@example.com",
+    "phone": "+33123456789",
+    "role": "RECRUITER",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "companyId": "cm1z8company123",
+    "company": {
+      "id": "cm1z8company123",
+      "compName": "TechCorp",
+      "place": "Paris, France",
+      "website": "https://techcorp.com"
+    },
+    "jobApplications": [
+      {
+        "id": "cm1z8app123",
+        "message": "Je suis intéressé par ce poste...",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "job": {
+          "id": "cm1z8job123",
+          "title": "Développeur Full Stack",
+          "company": {
+            "compName": "TechCorp"
+          }
+        }
+      }
+    ],
+    "createdJobs": [
+      {
+        "id": "cm1z8job456",
+        "title": "Développeur Backend",
+        "type": "CDI",
+        "location": "Paris, France",
+        "createdAt": "2024-01-01T00:00:00.000Z",
+        "_count": {
+          "jobApplications": 8
+        }
+      }
+    ],
+    "_count": {
+      "jobApplications": 2,
+      "createdJobs": 3
+    }
+  }
+}
 ```
 
 ### Erreur - Non authentifié
