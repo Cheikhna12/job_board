@@ -70,6 +70,56 @@ DELETE /api/companies/cm1z8example-company-id
 Cookie: next-auth.session-token=ADMIN_TOKEN
 ```
 
+## Tests API Jobs
+
+### GET /api/jobs - Liste des offres d'emploi
+```http
+GET /api/jobs
+```
+
+### POST /api/jobs - Créer une offre d'emploi (RECRUITER/ADMIN)
+```http
+POST /api/jobs
+Content-Type: application/json
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+
+{
+  "title": "Développeur Full Stack",
+  "type": "CDI",
+  "shortDescription": "Rejoignez notre équipe de développement",
+  "description": "Nous recherchons un développeur expérimenté en React et Node.js pour rejoindre notre équipe dynamique...",
+  "salary": 45000,
+  "location": "Paris, France"
+}
+```
+
+### GET /api/jobs/{id} - Détails d'une offre d'emploi
+```http
+GET /api/jobs/cm1z8example-job-id
+```
+
+### PUT /api/jobs/{id} - Modifier une offre d'emploi (RECRUITER/ADMIN)
+```http
+PUT /api/jobs/cm1z8example-job-id
+Content-Type: application/json
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+
+{
+  "title": "Développeur Full Stack Senior",
+  "type": "CDI",
+  "shortDescription": "Poste senior dans notre équipe",
+  "description": "Description mise à jour...",
+  "salary": 55000,
+  "location": "Lyon, France"
+}
+```
+
+### DELETE /api/jobs/{id} - Supprimer une offre d'emploi (RECRUITER/ADMIN)
+```http
+DELETE /api/jobs/cm1z8example-job-id
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+```
+
 ## Réponses Attendues
 
 ### Succès - Liste des entreprises
@@ -98,6 +148,36 @@ Cookie: next-auth.session-token=ADMIN_TOKEN
     "pages": 3
   }
 }
+```
+
+### Succès - Liste des offres d'emploi
+```json
+[
+  {
+    "id": "cm1z8job123",
+    "title": "Développeur Full Stack",
+    "type": "CDI",
+    "shortDescription": "Rejoignez notre équipe de développement",
+    "description": "Nous recherchons un développeur expérimenté...",
+    "salary": 45000,
+    "location": "Paris, France",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "companyId": "cm1z8company123",
+    "createdBy": "cm1z8user123",
+    "company": {
+      "id": "cm1z8company123",
+      "compName": "TechCorp",
+      "place": "Paris, France"
+    },
+    "creator": {
+      "id": "cm1z8user123",
+      "firstname": "John",
+      "lastname": "Doe",
+      "email": "john.doe@techcorp.com"
+    }
+  }
+]
 ```
 
 ### Erreur - Non authentifié

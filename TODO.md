@@ -16,7 +16,14 @@
 - [x] `GET /api/auth/session` - Session
 - [x] `POST /api/auth/signout` - Déconnexion
 
-## 🚧 À Faire (Équipe)
+### Documentation & Tests
+- [x] Swagger UI complet - http://localhost:3000/api-docs
+- [x] Documentation OpenAPI 3.0
+- [x] Guide d'architecture - ARCHITECTURE_GUIDE.md
+- [x] Guide de tests API - SWAGGER_TESTS.md
+- [x] Guide de contribution - CONTRIBUTING.md
+
+##  À Faire (Équipe)
 
 ### Phase 1: APIs Backend
 **Priorité: HAUTE**
@@ -29,9 +36,11 @@
 - [x] `DELETE /api/jobs/[id]` - Supprimer offre
 
 #### Companies API  
-- [ ] `GET /api/companies` - Liste entreprises
-- [ ] `POST /api/companies` - Créer entreprise (ADMIN)
-- [ ] `PUT /api/companies/[id]` - Modifier entreprise
+- [x] `GET /api/companies` - Liste entreprises 
+- [x] `POST /api/companies` - Créer entreprise (ADMIN) 
+- [x] `GET /api/companies/[id]` - Détails entreprise 
+- [x] `PUT /api/companies/[id]` - Modifier entreprise 
+- [x] `DELETE /api/companies/[id]` - Supprimer entreprise 
 
 #### Applications API
 - [ ] `GET /api/applications` - Liste candidatures

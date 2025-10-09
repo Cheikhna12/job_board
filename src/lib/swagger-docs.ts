@@ -196,6 +196,254 @@
 
 /**
  * @swagger
+ * /api/jobs:
+ *   get:
+ *     summary: Liste toutes les offres d'emploi
+ *     tags: [Jobs]
+ *     responses:
+ *       200:
+ *         description: Liste des offres d'emploi récupérée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/Job'
+ *                   - type: object
+ *                     properties:
+ *                       company:
+ *                         $ref: '#/components/schemas/Company'
+ *                       creator:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           firstname:
+ *                             type: string
+ *                           lastname:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   post:
+ *     summary: Créer une nouvelle offre d'emploi
+ *     tags: [Jobs]
+ *     security:
+ *       - cookieAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - title
+ *               - type
+ *               - shortDescription
+ *               - description
+ *               - salary
+ *               - location
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Développeur Full Stack"
+ *               type:
+ *                 type: string
+ *                 enum: [CDI, CDD, Stage, Freelance]
+ *                 example: "CDI"
+ *               shortDescription:
+ *                 type: string
+ *                 example: "Rejoignez notre équipe de développement"
+ *               description:
+ *                 type: string
+ *                 example: "Nous recherchons un développeur expérimenté en React et Node.js..."
+ *               salary:
+ *                 type: number
+ *                 example: 45000
+ *               location:
+ *                 type: string
+ *                 example: "Paris, France"
+ *     responses:
+ *       201:
+ *         description: Offre d'emploi créée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Job'
+ *       400:
+ *         description: Données invalides ou utilisateur sans entreprise
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Accès refusé - Rôle RECRUITER ou ADMIN requis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
+ * /api/jobs/{id}:
+ *   get:
+ *     summary: Récupère les détails d'une offre d'emploi
+ *     tags: [Jobs]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'offre d'emploi
+ *     responses:
+ *       200:
+ *         description: Détails de l'offre d'emploi
+ *         content:
+ *           application/json:
+ *             schema:
+ *               allOf:
+ *                 - $ref: '#/components/schemas/Job'
+ *                 - type: object
+ *                   properties:
+ *                     company:
+ *                       $ref: '#/components/schemas/Company'
+ *                     creator:
+ *                       type: object
+ *                       properties:
+ *                         id:
+ *                           type: string
+ *                         firstname:
+ *                           type: string
+ *                         lastname:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                     jobApplications:
+ *                       type: array
+ *                       items:
+ *                         $ref: '#/components/schemas/JobApplication'
+ *       404:
+ *         description: Offre d'emploi non trouvée
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   put:
+ *     summary: Modifier une offre d'emploi
+ *     tags: [Jobs]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'offre d'emploi
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *                 example: "Développeur Full Stack Senior"
+ *               type:
+ *                 type: string
+ *                 enum: [CDI, CDD, Stage, Freelance]
+ *                 example: "CDI"
+ *               shortDescription:
+ *                 type: string
+ *                 example: "Poste senior dans notre équipe"
+ *               description:
+ *                 type: string
+ *                 example: "Description mise à jour..."
+ *               salary:
+ *                 type: number
+ *                 example: 55000
+ *               location:
+ *                 type: string
+ *                 example: "Lyon, France"
+ *     responses:
+ *       200:
+ *         description: Offre d'emploi modifiée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Job'
+ *       403:
+ *         description: Accès refusé - Rôle RECRUITER ou ADMIN requis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   delete:
+ *     summary: Supprimer une offre d'emploi
+ *     tags: [Jobs]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de l'offre d'emploi
+ *     responses:
+ *       200:
+ *         description: Offre d'emploi supprimée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Offre supprimée"
+ *       403:
+ *         description: Accès refusé - Rôle RECRUITER ou ADMIN requis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
  * /api/companies/{id}:
  *   get:
  *     tags: [Companies]

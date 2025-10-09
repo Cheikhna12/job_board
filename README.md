@@ -82,14 +82,29 @@ npx prisma db seed   # Peuple la base avec des données de test
 
 ## Documentation
 
-- [ARCHITECTURE.md](./ARCHITECTURE.md) - Architecture détaillée du projet
+### **Documentation Projet**
+- **[ARCHITECTURE_GUIDE.md](./ARCHITECTURE_GUIDE.md)** - Guide complet de l'architecture
+- **[SWAGGER_TESTS.md](./SWAGGER_TESTS.md)** - Guide de tests API avec Swagger
+- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Guide de contribution équipe
+
+### **APIs Documentées**
+- **Swagger UI** : http://localhost:3000/api-docs
+- **Spec OpenAPI** : http://localhost:3000/api/swagger
+
+### **APIs Disponibles**
+-  **Companies API** - CRUD complet avec permissions
+-  **Jobs API** - CRUD complet avec relations
+-  **Applications API** - À implémenter
+-  **Users API** - À implémenter
+
+### **Documentation Externe**
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
 - [NextAuth.js Documentation](https://next-auth.js.org)
 
 ## Étapes de Développement
 
-### Phase 1 : Configuration de Base ✅
+### Phase 1 : Configuration de Base 
 - [x] Setup du projet Next.js
 - [x] Configuration Prisma
 - [x] Structure des dossiers
@@ -104,7 +119,7 @@ npx prisma db seed   # Peuple la base avec des données de test
 - [x] Documentation Swagger UI
 
 ### Phase 3 : API et CRUD
-- [ ] Routes API pour les offres d'emploi
+- [x] Routes API pour les offres d'emploi 
 - [x] Routes API pour les entreprises 
 - [ ] Routes API pour les candidatures
 - [ ] Routes API pour les utilisateurs

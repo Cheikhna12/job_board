@@ -16,15 +16,20 @@ const swaggerDefinition = {
       url: 'http://localhost:3000',
       description: 'Serveur de développement',
     },
+  ],
+  tags: [
     {
-      url: 'https://jobboard.com',
-      description: 'Serveur de production',
+      name: 'Companies',
+      description: 'Gestion des entreprises',
+    },
+    {
+      name: 'Jobs',
+      description: 'Gestion des offres d\'emploi',
     },
   ],
   components: {
     securitySchemes: {
       cookieAuth: {
-        type: 'apiKey',
         in: 'cookie',
         name: 'next-auth.session-token',
         description: 'Cookie de session NextAuth.js',
@@ -69,14 +74,49 @@ const swaggerDefinition = {
         properties: {
           id: { type: 'string', example: 'cm1z8job123' },
           title: { type: 'string', example: 'Développeur Full Stack' },
+          type: { 
+            type: 'string', 
+            enum: ['CDI', 'CDD', 'Stage', 'Freelance'],
+            example: 'CDI' 
+          },
+          shortDescription: { type: 'string', example: 'Rejoignez notre équipe de développement' },
           description: { type: 'string', example: 'Nous recherchons un développeur expérimenté...' },
-          requirements: { type: 'string', example: 'React, Node.js, TypeScript' },
-          salary: { type: 'string', example: '45000' },
-          location: { type: 'string', example: 'Paris' },
-          jobType: { type: 'string', enum: ['CDI', 'CDD', 'FREELANCE', 'STAGE'], example: 'CDI' },
-          companyId: { type: 'string', example: 'cm1z8company123' },
+          salary: { type: 'number', nullable: true, example: 45000 },
+          location: { type: 'string', example: 'Paris, France' },
           createdAt: { type: 'string', format: 'date-time' },
           updatedAt: { type: 'string', format: 'date-time' },
+          companyId: { type: 'string', example: 'cm1z8company123' },
+          createdBy: { type: 'string', example: 'cm1z8user123' },
+          company: { $ref: '#/components/schemas/Company' },
+          creator: {
+            type: 'object',
+            properties: {
+              id: { type: 'string', example: 'cm1z8user123' },
+              firstname: { type: 'string', example: 'John' },
+              lastname: { type: 'string', example: 'Doe' },
+              email: { type: 'string', example: 'john.doe@company.com' },
+            },
+          },
+          _count: {
+            type: 'object',
+            properties: {
+              jobApplications: { type: 'integer', example: 12 },
+            },
+          },
+        },
+      },
+      JobApplication: {
+        type: 'object',
+        properties: {
+          id: { type: 'string', example: 'cm1z8app123' },
+          message: { type: 'string', example: 'Je suis très intéressé par ce poste...' },
+          applicantName: { type: 'string', example: 'Marie Dupont' },
+          applicantEmail: { type: 'string', example: 'marie.dupont@email.com' },
+          applicantPhone: { type: 'string', nullable: true, example: '+33123456789' },
+          createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time' },
+          jobId: { type: 'string', example: 'cm1z8job123' },
+          userId: { type: 'string', nullable: true, example: 'cm1z8user123' },
         },
       },
       Application: {
