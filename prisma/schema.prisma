@@ -23,6 +23,13 @@ enum JobType {
   Freelance
 }
 
+enum ApplicationStatus {
+  EN_ATTENTE
+  ACCEPTEE
+  REFUSEE
+}
+
+
 model Company {
   id          String   @id @default(cuid())
   compName    String
@@ -67,20 +74,21 @@ model Job {
   type             JobType
   shortDescription String   @db.Text
   description      String   @db.Text
-  salary           Float?
+  salary           Float
   location         String
+  categories       String[] @default([]) 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-  
+
   // Relations
   companyId String
   company   Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
-  
+
   createdBy String
   creator   User   @relation(fields: [createdBy], references: [id], onDelete: Cascade)
-  
+
   jobApplications JobApplication[]
-  
+
   @@map("jobs")
 }
 
@@ -90,16 +98,16 @@ model JobApplication {
   applicantName  String
   applicantEmail String
   applicantPhone String?
+  status         ApplicationStatus @default(EN_ATTENTE)
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
-  
+
   // Relations
   jobId String
   job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
-  // Relation optionnelle avec User (pour les candidatures authentifiées)
+
   userId String?
   user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
-  
+
   @@map("job_applications")
 }

@@ -29,6 +29,8 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.64.0",
+    "swagger-ui-dist": "^5.29.3",
+    "swagger-ui-express": "^5.0.1",
     "zod": "^4.1.11"
   },
   "devDependencies": {
@@ -37,6 +39,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/swagger-jsdoc": "^6.0.4",
     "eslint": "^9",
     "eslint-config-next": "15.5.4",
     "tailwindcss": "^4",
