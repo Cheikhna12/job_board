@@ -31,6 +31,8 @@
     "react-dom": "19.1.0",
     "react-hook-form": "^7.64.0",
     "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-dist": "^5.29.3",
+    "swagger-ui-express": "^5.0.1",
     "swagger-ui-react": "^5.29.3",
     "zod": "^4.1.12"
   },
