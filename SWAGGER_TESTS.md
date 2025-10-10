@@ -487,7 +487,7 @@ Cookie: next-auth.session-token=RECRUITER_TOKEN
 
 ### 1. Ouvrir Swagger UI
 - Aller sur http://localhost:3000/api-docs
-- La documentation interactive se charge automatiquement
+- La documentation se charge automatiquement
 
 ### 2. Authentification dans Swagger
 - Cliquer sur le bouton "Authorize" 
@@ -500,23 +500,6 @@ Cookie: next-auth.session-token=RECRUITER_TOKEN
 - Remplir les paramètres requis
 - Cliquer sur "Execute"
 - Voir la réponse en temps réel
-
-## Avantages de Swagger UI
-
-### Documentation Interactive
-- Visualisation claire de tous les endpoints
-- Schémas de données détaillés
-- Exemples de requêtes/réponses
-
-### Tests en Direct
-- Exécution des requêtes directement depuis l'interface
-- Gestion automatique des headers
-- Validation des données en temps réel
-
-### Collaboration Équipe
-- Documentation toujours à jour
-- Partage facile avec l'équipe
-- Standards OpenAPI 3.0
 
 ## Configuration Avancée
 
@@ -552,7 +535,4 @@ servers: [
 3. **Validation** : Zod valide automatiquement les données côté serveur
 4. **Permissions** : Respecter les rôles (ADMIN/RECRUITER/USER) pour chaque endpoint
 
-## Prêt à tester !
 
-API Companies est documentée et testable via Swagger UI ! 
-Accédez à http://localhost:3000/api-docs pour commencer. 
