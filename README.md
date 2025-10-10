@@ -1,6 +1,6 @@
 # Job Board - Plateforme d'Offres d'Emploi
 
-Une plateforme moderne de gestion d'offres d'emploi construite avec Next.js 14+, Prisma, et PostgreSQL.
+Une plateforme moderne de gestion d'offres d'emploi construite avec Next.js, Prisma, et PostgreSQL.
 
 ## Prérequis
 
@@ -91,12 +91,6 @@ npx prisma db seed   # Peuple la base avec des données de test
 - **Swagger UI** : http://localhost:3000/api-docs
 - **Spec OpenAPI** : http://localhost:3000/api/swagger
 
-### **APIs Disponibles**
--  **Companies API** - CRUD complet avec permissions
--  **Jobs API** - CRUD complet avec relations
--  **Applications API** - À implémenter
--  **Users API** - À implémenter
-
 ### **Documentation Externe**
 - [Prisma Documentation](https://www.prisma.io/docs)
 - [Next.js Documentation](https://nextjs.org/docs)
@@ -121,20 +115,15 @@ npx prisma db seed   # Peuple la base avec des données de test
 ### Phase 3 : API et CRUD
 - [x] Routes API pour les offres d'emploi 
 - [x] Routes API pour les entreprises 
-- [ ] Routes API pour les candidatures
-- [ ] Routes API pour les utilisateurs
+- [x] Routes API pour les candidatures
+- [x] Routes API pour les utilisateurs
 
 ### Phase 4 : Interface Utilisateur
-- [ ] Liste des offres d'emploi
-- [ ] Détails d'une offre
-- [ ] Formulaire de candidature
-- [ ] Dashboard administrateur
+- [x] Liste des offres d'emploi
+- [x] Détails d'une offre
+- [x] Formulaire de candidature
+- [x] Dashboard administrateur
 
-### Phase 5 : Fonctionnalités Avancées
-- [ ] Système de notifications
-- [ ] Upload de fichiers (CV)
-- [ ] Filtres et recherche
-- [ ] Pagination
 
 ## Contribution
 
