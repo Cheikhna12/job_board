@@ -72,7 +72,7 @@ npx prisma db seed   # Peuple la base avec des données de test
 
 ## Stack Technologique
 
-- **Frontend & Backend** : Next.js 14+ (App Router)
+- **Frontend & Backend** : Next.js (App Router)
 - **Base de données** : PostgreSQL
 - **ORM** : Prisma
 - **Authentication** : NextAuth.js
