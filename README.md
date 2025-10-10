@@ -85,7 +85,6 @@ npx prisma db seed   # Peuple la base avec des données de test
 ### **Documentation Projet**
 - **[ARCHITECTURE_GUIDE.md](./ARCHITECTURE_GUIDE.md)** - Guide complet de l'architecture
 - **[SWAGGER_TESTS.md](./SWAGGER_TESTS.md)** - Guide de tests API avec Swagger
-- **[CONTRIBUTING.md](./CONTRIBUTING.md)** - Guide de contribution équipe
 
 ### **APIs Documentées**
 - **Swagger UI** : http://localhost:3000/api-docs
