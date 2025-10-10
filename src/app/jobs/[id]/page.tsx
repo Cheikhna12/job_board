@@ -1,103 +1,130 @@
-"use client";
+import Link from 'next/link'
+import JobApplicationSection from '@/components/JobApplicationSection'
 
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
-
-type JobDetail = {
+interface JobDetails {
   id: string;
   title: string;
-  type: string;
-  shortDescription: string;
-  description: string;
-  salary?: number;
+  company: {
+    id: string;
+    compName: string;
+  };
   location: string;
-  company: { compName: string; place: string; website?: string };
-  creator: { firstname: string; lastname: string };
-};
+  description: string;
+  createdAt: string;
+  type: string;
+  salary?: number | string;
+}
 
-export default function JobDetailPage() {
-  const { id } = useParams();
-  const { data: session } = useSession();
-  const router = useRouter();
-  const [job, setJob] = useState<JobDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+async function getJobDetails(id: string): Promise<JobDetails | null> {
+  try {
+    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const response = await fetch(`${baseUrl}/api/jobs/${id}`, {
+      cache: 'no-store'
+    })
+    if (!response.ok) return null
+    return response.json()
+  } catch (error) {
+    console.error("Impossible de récupérer les détails de l'offre:", error)
+    return null
+  }
+}
 
-  useEffect(() => {
-    async function fetchJob() {
-      try {
-        const res = await fetch(`/api/jobs/${id}`);
-        const data = await res.json();
-        setJob(data);
-      } catch (err) {
-        console.error("Erreur fetch job:", err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchJob();
-  }, [id]);
+export default async function JobDetailsPage({ params }: { params: { id: string } }) {
+  const job = await getJobDetails(params.id)
 
-  if (loading) return <p>Chargement de l'offre...</p>;
-  if (!job) return <p>Offre introuvable</p>;
+  if (!job) {
+    return (
+      <div className="min-h-screen bg-white">
+        <div className="max-w-4xl mx-auto px-6 py-24 text-center">
+          <h1 className="text-2xl font-bold text-slate-800 mb-4">Offre d'emploi non trouvée</h1>
+          <Link href="/jobs" className="text-slate-600 hover:text-slate-900 font-semibold">
+            ← Retour à la liste des offres
+          </Link>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-3xl font-bold mb-2">{job.title}</h1>
-      <p className="text-gray-700 mb-2">{job.shortDescription}</p>
-      <p className="text-gray-600 mb-2">{job.description}</p>
-      <p className="text-sm text-gray-500 mb-2">
-        {job.location} — {job.type}
-      </p>
-      {job.salary && <p className="text-sm text-gray-500 mb-2">Salaire: {job.salary} €</p>}
-      <p className="text-sm text-gray-500 mb-4">
-        Entreprise: {job.company.compName} ({job.company.place})
-        {job.company.website && (
-          <> — <a href={job.company.website} className="text-blue-600 underline">{job.company.website}</a></>
-        )}
-      </p>
-
-      {(!session || session.user.role === "USER" || session.user.role === "USER") && (
-        <button
-          className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 mb-4"
-          onClick={() => router.push(`/jobs/${id}/apply`)}
-        >
-          Postuler
-        </button>
-      )}
-
-      {(session?.user.role === "RECRUITER" || session?.user.role === "ADMIN") && (
-        <div className="flex gap-2 mt-4">
-          <button
-            className="px-4 py-2 bg-gray-400 text-white rounded hover:bg-gray-500"
-            onClick={() => router.push("/jobs")}
-          >
-            Retour à la liste
-          </button>
-
-          {(session?.user.role === "RECRUITER" || session?.user.role === "ADMIN") && (
-            <>
-              <button
-                className="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600"
-                onClick={() => router.push(`/jobs/${id}/edit`)}
-              >
-                Modifier
-              </button>
-              <button
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-                onClick={async () => {
-                  if (confirm("Voulez-vous vraiment supprimer cette offre ?")) {
-                    await fetch(`/api/jobs/${id}`, { method: "DELETE" });
-                    router.push("/jobs");
-                  }
-                }}
-              >
-                Supprimer
-              </button>
-            </>
-          )}
+    <div className="min-h-screen bg-white font-sans text-slate-800">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
+        {/* Fil d'Ariane */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
+          <Link href="/jobs" className="hover:text-slate-900">Toutes les offres</Link>
+          <span>/</span>
+          <span className="font-semibold text-slate-800">{job.title}</span>
         </div>
-      )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          {/* Colonne principale */}
+          <div className="lg:col-span-2">
+            <div className="mb-8">
+              <h1 className="text-4xl font-bold tracking-tight">{job.title}</h1>
+              <div className="mt-4 flex items-center gap-4 text-slate-600">
+                <Link href={`/companies/${job.company.id}`} className="font-bold text-slate-800 hover:underline">{job.company.compName}</Link>
+                <span>·</span>
+                <span>{job.location}</span>
+              </div>
+            </div>
+
+            <div className="prose prose-lg max-w-none text-slate-700 leading-relaxed">
+              <h2 className="font-bold">Description du poste</h2>
+              <p>{job.description}</p>
+
+              <h2 className="font-bold">Responsabilités</h2>
+              <ul>
+                <li>Développer et maintenir des applications web.</li>
+                <li>Collaborer avec les équipes de design et de produit.</li>
+                <li>Écrire du code propre, testable et efficace.</li>
+              </ul>
+
+              <h2 className="font-bold">Qualifications</h2>
+              <ul>
+                <li>Expérience avec React, Node.js, et TypeScript.</li>
+                <li>Bonne connaissance des bases de données SQL.</li>
+                <li>Esprit d'équipe et excellentes capacités de communication.</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* Colonne latérale */}
+          <aside>
+            <div className="sticky top-24 space-y-8">
+              {/* Bouton Postuler */}
+              <JobApplicationSection 
+                jobId={job.id}
+                jobTitle={job.title}
+                createdAt={job.createdAt}
+              />
+
+              {/* Informations clés */}
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-6">
+                <h3 className="text-lg font-bold mb-4">Informations clés</h3>
+                <ul className="space-y-3 text-slate-600">
+                  <li className="flex items-start">
+                    <span className="font-semibold w-24 flex-shrink-0">Contrat</span>
+                    <span className="font-medium text-slate-800">{job.type}</span>
+                  </li>
+                  <li className="flex items-start">
+                    <span className="font-semibold w-24 flex-shrink-0">Lieu</span>
+                    <span className="font-medium text-slate-800">{job.location}</span>
+                  </li>
+                  {job.salary && (
+                    <li className="flex items-start">
+                      <span className="font-semibold w-24 flex-shrink-0">Salaire</span>
+                      <span className="font-medium text-slate-800">{job.salary}€ / an</span>
+                    </li>
+                  )}
+                  <li className="flex items-start">
+                    <span className="font-semibold w-24 flex-shrink-0">Secteur</span>
+                    <span className="font-medium text-slate-800">Technologie</span>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

@@ -30,6 +30,10 @@ const swaggerDefinition = {
       name: 'Users',
       description: 'Gestion des utilisateurs',
     },
+    {
+      name: 'Applications',
+      description: 'Gestion des candidatures',
+    },
   ],
   components: {
     securitySchemes: {

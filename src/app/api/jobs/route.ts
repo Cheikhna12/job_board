@@ -30,15 +30,19 @@ export async function POST(req: Request) {
 
   try {
     const data = await req.json();
-    const { title, type, shortDescription, description, salary, location } = data;
+    const { title, type, shortDescription, description, salary, location, companyId } = data;
 
-    if (!title || !type || !shortDescription || !description || salary === undefined || !location) {
+    if (!title || !type || !shortDescription || !description || salary === undefined || !location || !companyId) {
       return NextResponse.json({ error: "Tous les champs obligatoires doivent être remplis" }, { status: 400 });
     }
 
-    const companyId = session.user.companyId;
-    if (!companyId) {
-      return NextResponse.json({ error: "Utilisateur recruteur sans entreprise assignée" }, { status: 400 });
+    // Vérifier que l'entreprise existe
+    const company = await prisma.company.findUnique({
+      where: { id: companyId }
+    });
+
+    if (!company) {
+      return NextResponse.json({ error: "Entreprise non trouvée" }, { status: 404 });
     }
 
     const newJob = await prisma.job.create({

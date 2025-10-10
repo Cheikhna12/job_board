@@ -1,24 +1,27 @@
-import type { Metadata } from "next";
-import "./globals.css";
 import { SessionProvider } from '@/components/SessionProvider'
+import Header from '@/components/layout/Header'
+import Footer from '@/components/layout/Footer'
+import './globals.css' // Assurez-vous que les styles globaux sont importés
 
-export const metadata: Metadata = {
-  title: "Job Board - Plateforme d'offres d'emploi",
-  description: "Trouvez votre prochain emploi ou recrutez les meilleurs talents",
-};
+export const metadata = {
+  title: 'Job Board | Trouvez votre prochain emploi',
+  description: 'Plateforme moderne pour connecter talents et entreprises innovantes.'
+}
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
-      <body className="antialiased">
+      <body className="bg-white font-sans text-slate-800 antialiased">
         <SessionProvider>
-          {children}
+          <div className="flex flex-col min-h-screen">
+            <Header />
+            <main className="flex-grow">
+              {children}
+            </main>
+            <Footer />
+          </div>
         </SessionProvider>
       </body>
     </html>
-  );
+  )
 }

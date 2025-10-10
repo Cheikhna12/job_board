@@ -1,225 +1,193 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
-type Job = { id: string; title: string };
-type Application = {
+interface JobApplication {
   id: string;
   message: string;
   applicantName: string;
   applicantEmail: string;
   applicantPhone?: string;
   status: string;
-  job: { id: string; title: string; company: { compName: string } };
-};
+  createdAt: string;
+  job: { 
+    id: string; 
+    title: string; 
+    company: { compName: string } 
+  };
+}
 
 const STATUSES = ["EN_ATTENTE", "ACCEPTEE", "REFUSEE"] as const;
 
 export default function ApplicationsPage() {
-  const [applications, setApplications] = useState<Application[]>([]);
-  const [jobs, setJobs] = useState<Job[]>([]);
-  const [filterStatus, setFilterStatus] = useState<string>("");
-  const [search, setSearch] = useState<string>("");
-
-  const [newJobId, setNewJobId] = useState<string>("");
-  const [newName, setNewName] = useState<string>("");
-  const [newEmail, setNewEmail] = useState<string>("");
-  const [newPhone, setNewPhone] = useState<string>("");
-  const [newMessage, setNewMessage] = useState<string>("");
-
-  async function fetchApplications() {
-    const res = await fetch("/api/applications");
-    const data = await res.json();
-    setApplications(data);
-  }
-
-  async function fetchJobs() {
-    const res = await fetch("/api/jobs");
-    const data = await res.json();
-    setJobs(data);
-    if (data.length > 0) setNewJobId(data[0].id);
-  }
+  const { data: session, status } = useSession();
+  const [applications, setApplications] = useState<JobApplication[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    fetchApplications();
-    fetchJobs();
-  }, []);
-
-  async function updateStatus(id: string, status: typeof STATUSES[number]) {
-    const res = await fetch(`/api/applications/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (res.ok) {
+    if (status === 'authenticated') {
       fetchApplications();
-    } else {
-      alert("Erreur lors de la mise à jour du statut");
+    } else if (status === 'unauthenticated') {
+      setLoading(false);
+    }
+  }, [status]);
+
+  async function fetchApplications() {
+    try {
+      const res = await fetch("/api/applications");
+      if (res.ok) {
+        const data = await res.json();
+        setApplications(data);
+      } else {
+        setError("Impossible de charger les candidatures");
+      }
+    } catch (err) {
+      setError("Erreur lors du chargement");
+    } finally {
+      setLoading(false);
     }
   }
 
-  async function submitApplication(e: React.FormEvent) {
-    e.preventDefault();
-    if (!newJobId || !newName || !newEmail || !newMessage) {
-      alert("Veuillez remplir tous les champs obligatoires");
-      return;
+  const getStatusBadge = (status: string) => {
+    const styles = {
+      EN_ATTENTE: 'bg-yellow-100 text-yellow-800',
+      ACCEPTEE: 'bg-green-100 text-green-800',
+      REFUSEE: 'bg-red-100 text-red-800'
     }
-
-    const res = await fetch("/api/applications", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jobId: newJobId,
-        applicantName: newName,
-        applicantEmail: newEmail,
-        applicantPhone: newPhone,
-        message: newMessage,
-      }),
-    });
-
-    if (res.ok) {
-      setNewName("");
-      setNewEmail("");
-      setNewPhone("");
-      setNewMessage("");
-      setNewJobId(jobs[0]?.id || "");
-      fetchApplications();
-    } else {
-      alert("Erreur lors de la création de la candidature");
-    }
+    return styles[status as keyof typeof styles] || styles.EN_ATTENTE
   }
 
-  const filteredApplications = applications.filter((app) => {
-    const matchesStatus = filterStatus ? app.status === filterStatus : true;
-    const matchesSearch =
-      app.applicantName.toLowerCase().includes(search.toLowerCase()) ||
-      app.job.title.toLowerCase().includes(search.toLowerCase()) ||
-      app.job.company.compName.toLowerCase().includes(search.toLowerCase());
-    return matchesStatus && matchesSearch;
-  });
+  if (status === 'loading' || loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800 mx-auto mb-4"></div>
+          <p className="text-slate-600">Chargement des candidatures...</p>
+        </div>
+      </div>
+    )
+  }
+
+  if (status === 'unauthenticated') {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-800 mb-4">Connexion requise</h1>
+          <p className="text-slate-600 mb-6">Vous devez être connecté pour voir vos candidatures.</p>
+          <Link href="/auth/login" className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+            Se connecter
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-slate-800 mb-4">Erreur</h1>
+          <p className="text-slate-600 mb-6">{error}</p>
+          <button 
+            onClick={fetchApplications}
+            className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+          >
+            Réessayer
+          </button>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="p-6 max-w-5xl mx-auto">
-      <h1 className="text-3xl mb-4">Gestion des candidatures</h1>
+    <div className="min-h-screen bg-white font-sans text-slate-800">
+      <div className="max-w-6xl mx-auto px-6 lg:px-8 py-16">
+        {/* Fil d'Ariane */}
+        <div className="flex items-center gap-2 text-sm text-slate-500 mb-8">
+          <Link href="/" className="hover:text-slate-900">Accueil</Link>
+          <span>/</span>
+          <span className="font-semibold text-slate-800">Mes candidatures</span>
+        </div>
 
-      <div className="flex gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Recherche par nom, poste ou entreprise"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="border p-2 rounded flex-1"
-        />
-        <select
-          value={filterStatus}
-          onChange={(e) => setFilterStatus(e.target.value)}
-          className="border p-2 rounded"
-        >
-          <option value="">Tous les statuts</option>
-          {STATUSES.map((status) => (
-            <option key={status} value={status}>
-              {status}
-            </option>
-          ))}
-        </select>
-        <button
-          onClick={fetchApplications}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Actualiser
-        </button>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold tracking-tight mb-4">Mes candidatures</h1>
+          <p className="text-lg text-slate-600">Suivez l'état de vos candidatures aux offres d'emploi.</p>
+        </div>
+
+        {applications.length === 0 ? (
+          <div className="bg-white border border-slate-200 rounded-xl shadow-sm p-12 text-center">
+            <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <span className="text-2xl">📄</span>
+            </div>
+            <h3 className="text-xl font-bold mb-2">Aucune candidature</h3>
+            <p className="text-slate-600 mb-6">Vous n'avez pas encore postulé à d'offres d'emploi.</p>
+            <Link
+              href="/jobs"
+              className="bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-lg font-semibold transition-colors"
+            >
+              Parcourir les offres
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {applications.map((application) => (
+              <div key={application.id} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-start justify-between mb-4">
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-900 mb-1">
+                          <Link 
+                            href={`/jobs/${application.job.id}`}
+                            className="hover:text-slate-600"
+                          >
+                            {application.job.title}
+                          </Link>
+                        </h3>
+                        <p className="text-slate-600 font-medium">{application.job.company.compName}</p>
+                      </div>
+                      <span className={`px-3 py-1 text-sm font-semibold rounded-full ${getStatusBadge(application.status)}`}>
+                        {application.status.replace('_', ' ')}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                      <div>
+                        <span className="font-semibold text-slate-700">Candidat :</span>
+                        <p className="text-slate-900">{application.applicantName}</p>
+                      </div>
+                      <div>
+                        <span className="font-semibold text-slate-700">Email :</span>
+                        <p className="text-slate-900">{application.applicantEmail}</p>
+                      </div>
+                      {application.applicantPhone && (
+                        <div>
+                          <span className="font-semibold text-slate-700">Téléphone :</span>
+                          <p className="text-slate-900">{application.applicantPhone}</p>
+                        </div>
+                      )}
+                      <div>
+                        <span className="font-semibold text-slate-700">Candidature envoyée :</span>
+                        <p className="text-slate-900">{new Date(application.createdAt).toLocaleDateString('fr-FR')}</p>
+                      </div>
+                    </div>
+
+                    {application.message && (
+                      <div className="mt-4 p-4 bg-slate-50 rounded-lg">
+                        <span className="font-semibold text-slate-700 block mb-2">Message de motivation :</span>
+                        <p className="text-slate-900 text-sm leading-relaxed">{application.message}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      <form onSubmit={submitApplication} className="mb-6 border p-4 rounded space-y-2">
-        <h2 className="text-xl font-semibold mb-2">Nouvelle candidature</h2>
-        <select
-          value={newJobId}
-          onChange={(e) => setNewJobId(e.target.value)}
-          className="border p-2 rounded w-full"
-        >
-          {jobs.map((job) => (
-            <option key={job.id} value={job.id}>
-              {job.title}
-            </option>
-          ))}
-        </select>
-        <input
-          type="text"
-          placeholder="Nom"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="email"
-          placeholder="Email"
-          value={newEmail}
-          onChange={(e) => setNewEmail(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <input
-          type="tel"
-          placeholder="Téléphone (optionnel)"
-          value={newPhone}
-          onChange={(e) => setNewPhone(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <textarea
-          placeholder="Message"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          className="border p-2 rounded w-full"
-        />
-        <button
-          type="submit"
-          className="bg-green-600 text-white px-4 py-2 rounded"
-        >
-          Postuler
-        </button>
-      </form>
-
-      <ul className="space-y-4">
-        {filteredApplications.map((app) => (
-          <li
-            key={app.id}
-            className="border p-4 rounded shadow flex flex-col md:flex-row md:justify-between md:items-center"
-          >
-            <div>
-              <p className="font-semibold">{app.applicantName}</p>
-              <p>{app.applicantEmail}</p>
-              {app.applicantPhone && <p>Téléphone: {app.applicantPhone}</p>}
-              <p>
-                Poste: <strong>{app.job.title}</strong> @ {app.job.company.compName}
-              </p>
-              <p>Status: {app.status}</p>
-            </div>
-
-            <div className="mt-2 md:mt-0 flex gap-2">
-              {STATUSES.map((status) => (
-                <button
-                  key={status}
-                  onClick={() => updateStatus(app.id, status)}
-                  className={`px-3 py-1 rounded font-semibold ${
-                    app.status === status
-                      ? "bg-gray-500 text-white"
-                      : status === "EN_ATTENTE"
-                      ? "bg-gray-300"
-                      : status === "ACCEPTEE"
-                      ? "bg-green-400 text-white"
-                      : "bg-red-500 text-white"
-                  }`}
-                >
-                  {status}
-                </button>
-              ))}
-            </div>
-          </li>
-        ))}
-      </ul>
-
-      {filteredApplications.length === 0 && (
-        <p className="text-center mt-6 text-gray-500">Aucune candidature trouvée</p>
-      )}
     </div>
-  );
+  )
 }

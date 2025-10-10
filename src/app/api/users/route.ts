@@ -62,8 +62,14 @@ export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
     
+    // Debug: Log de la session pour diagnostiquer le problème
+    console.log('Session complète:', JSON.stringify(session, null, 2))
+    console.log('Rôle utilisateur:', session?.user?.role)
+    console.log('Type du rôle:', typeof session?.user?.role)
+    
     // Seuls les ADMIN peuvent lister tous les utilisateurs
     if (!session || session.user.role !== 'ADMIN') {
+      console.log('Accès refusé - Session:', !!session, 'Rôle:', session?.user?.role)
       return NextResponse.json(
         { error: 'Accès refusé - Rôle ADMIN requis' },
         { status: 403 }
@@ -100,16 +106,7 @@ export async function GET(request: NextRequest) {
         skip,
         take: limit,
         orderBy: { createdAt: 'desc' },
-        select: {
-          id: true,
-          firstname: true,
-          lastname: true,
-          email: true,
-          phone: true,
-          role: true,
-          createdAt: true,
-          updatedAt: true,
-          companyId: true,
+        include: {
           company: {
             select: {
               id: true,

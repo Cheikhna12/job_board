@@ -183,6 +183,71 @@ DELETE /api/users/cm1z8example-user-id
 Cookie: next-auth.session-token=ADMIN_TOKEN
 ```
 
+## Tests API Applications
+
+### GET /api/applications - Liste des candidatures
+```http
+GET /api/applications
+Cookie: next-auth.session-token=USER_TOKEN
+```
+
+### GET /api/applications - Toutes les candidatures (RECRUITER/ADMIN)
+```http
+GET /api/applications
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+```
+
+### POST /api/applications - Postuler à une offre (utilisateur connecté)
+```http
+POST /api/applications
+Content-Type: application/json
+Cookie: next-auth.session-token=USER_TOKEN
+
+{
+  "jobId": "cm1z8job123",
+  "message": "Je suis très intéressé par ce poste car j'ai 5 ans d'expérience en développement React et Node.js. Mon profil correspond parfaitement aux exigences mentionnées.",
+  "applicantName": "Marie Dupont",
+  "applicantEmail": "marie.dupont@email.com",
+  "applicantPhone": "+33123456789"
+}
+```
+
+### POST /api/applications - Postuler anonyme (sans connexion)
+```http
+POST /api/applications
+Content-Type: application/json
+
+{
+  "jobId": "cm1z8job123",
+  "message": "Candidature spontanée pour le poste de développeur. Vous trouverez mon CV en pièce jointe.",
+  "applicantName": "Jean Martin",
+  "applicantEmail": "jean.martin@email.com",
+  "applicantPhone": "+33987654321"
+}
+```
+
+### PUT /api/applications/{id} - Changer statut candidature (RECRUITER/ADMIN)
+```http
+PUT /api/applications/cm1z8app123
+Content-Type: application/json
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+
+{
+  "status": "ACCEPTEE"
+}
+```
+
+### PUT /api/applications/{id} - Refuser candidature (RECRUITER/ADMIN)
+```http
+PUT /api/applications/cm1z8app123
+Content-Type: application/json
+Cookie: next-auth.session-token=RECRUITER_TOKEN
+
+{
+  "status": "REFUSEE"
+}
+```
+
 ## Réponses Attendues
 
 ### Succès - Liste des entreprises
@@ -325,6 +390,69 @@ Cookie: next-auth.session-token=ADMIN_TOKEN
       "createdJobs": 3
     }
   }
+}
+```
+
+### Succès - Liste des candidatures (USER)
+```json
+[
+  {
+    "id": "cm1z8app123",
+    "message": "Je suis très intéressé par ce poste...",
+    "applicantName": "Marie Dupont",
+    "applicantEmail": "marie.dupont@email.com",
+    "applicantPhone": "+33123456789",
+    "status": "EN_ATTENTE",
+    "createdAt": "2024-01-01T00:00:00.000Z",
+    "updatedAt": "2024-01-01T00:00:00.000Z",
+    "jobId": "cm1z8job123",
+    "userId": "cm1z8user123",
+    "job": {
+      "id": "cm1z8job123",
+      "title": "Développeur Full Stack",
+      "company": {
+        "compName": "TechCorp"
+      }
+    },
+    "user": {
+      "id": "cm1z8user123",
+      "firstname": "Marie",
+      "lastname": "Dupont",
+      "email": "marie.dupont@email.com"
+    }
+  }
+]
+```
+
+### Succès - Candidature créée
+```json
+{
+  "id": "cm1z8app456",
+  "message": "Candidature pour le poste de développeur...",
+  "applicantName": "Jean Martin",
+  "applicantEmail": "jean.martin@email.com",
+  "applicantPhone": "+33987654321",
+  "status": "EN_ATTENTE",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T00:00:00.000Z",
+  "jobId": "cm1z8job123",
+  "userId": null
+}
+```
+
+### Succès - Statut candidature mis à jour
+```json
+{
+  "id": "cm1z8app123",
+  "message": "Je suis très intéressé par ce poste...",
+  "applicantName": "Marie Dupont",
+  "applicantEmail": "marie.dupont@email.com",
+  "applicantPhone": "+33123456789",
+  "status": "ACCEPTEE",
+  "createdAt": "2024-01-01T00:00:00.000Z",
+  "updatedAt": "2024-01-01T10:30:00.000Z",
+  "jobId": "cm1z8job123",
+  "userId": "cm1z8user123"
 }
 ```
 

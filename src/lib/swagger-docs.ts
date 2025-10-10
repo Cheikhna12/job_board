@@ -746,6 +746,179 @@
 
 /**
  * @swagger
+ * /api/applications:
+ *   get:
+ *     summary: Liste des candidatures
+ *     tags: [Applications]
+ *     security:
+ *       - cookieAuth: []
+ *     description: |
+ *       - **USER**: Voit seulement ses propres candidatures
+ *       - **RECRUITER/ADMIN**: Voit toutes les candidatures
+ *     responses:
+ *       200:
+ *         description: Liste des candidatures récupérée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 allOf:
+ *                   - $ref: '#/components/schemas/JobApplication'
+ *                   - type: object
+ *                     properties:
+ *                       job:
+ *                         type: object
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           title:
+ *                             type: string
+ *                           company:
+ *                             type: object
+ *                             properties:
+ *                               compName:
+ *                                 type: string
+ *                       user:
+ *                         type: object
+ *                         nullable: true
+ *                         properties:
+ *                           id:
+ *                             type: string
+ *                           firstname:
+ *                             type: string
+ *                           lastname:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *       403:
+ *         description: Non autorisé - Authentification requise
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   post:
+ *     summary: Créer une candidature
+ *     tags: [Applications]
+ *     description: Permet de postuler à une offre d'emploi. Peut être fait par un utilisateur connecté ou anonyme.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - jobId
+ *               - message
+ *               - applicantName
+ *               - applicantEmail
+ *             properties:
+ *               jobId:
+ *                 type: string
+ *                 example: "cm1z8job123"
+ *                 description: ID de l'offre d'emploi
+ *               message:
+ *                 type: string
+ *                 example: "Je suis très intéressé par ce poste car..."
+ *                 description: Message de motivation
+ *               applicantName:
+ *                 type: string
+ *                 example: "Marie Dupont"
+ *                 description: Nom complet du candidat
+ *               applicantEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: "marie.dupont@email.com"
+ *                 description: Email du candidat
+ *               applicantPhone:
+ *                 type: string
+ *                 example: "+33123456789"
+ *                 description: Téléphone du candidat (optionnel)
+ *     responses:
+ *       201:
+ *         description: Candidature créée avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/JobApplication'
+ *       400:
+ *         description: Champs obligatoires manquants
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
+ * /api/applications/{id}:
+ *   put:
+ *     summary: Modifier le statut d'une candidature (RECRUITER/ADMIN)
+ *     tags: [Applications]
+ *     security:
+ *       - cookieAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la candidature
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - status
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [EN_ATTENTE, ACCEPTEE, REFUSEE]
+ *                 example: "ACCEPTEE"
+ *                 description: Nouveau statut de la candidature
+ *     responses:
+ *       200:
+ *         description: Statut de la candidature mis à jour avec succès
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/JobApplication'
+ *       400:
+ *         description: Statut manquant ou invalide
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       403:
+ *         description: Non autorisé - Rôle RECRUITER/ADMIN requis
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Erreur serveur
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
+
+/**
+ * @swagger
  * /api/companies/{id}:
  *   get:
  *     tags: [Companies]
