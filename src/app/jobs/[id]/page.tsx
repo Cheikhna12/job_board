@@ -10,6 +10,8 @@ interface JobDetails {
   };
   location: string;
   description: string;
+  responsibilities?: string;
+  qualifications?: string;
   createdAt: string;
   type: string;
   salary?: number | string;
@@ -71,19 +73,19 @@ export default async function JobDetailsPage({ params }: { params: { id: string 
               <h2 className="font-bold">Description du poste</h2>
               <p>{job.description}</p>
 
-              <h2 className="font-bold">Responsabilités</h2>
-              <ul>
-                <li>Développer et maintenir des applications web.</li>
-                <li>Collaborer avec les équipes de design et de produit.</li>
-                <li>Écrire du code propre, testable et efficace.</li>
-              </ul>
+              {job.responsibilities && (
+                <>
+                  <h2 className="font-bold">Responsabilités</h2>
+                  <div dangerouslySetInnerHTML={{ __html: job.responsibilities.replace(/\n/g, '<br />') }} />
+                </>
+              )}
 
-              <h2 className="font-bold">Qualifications</h2>
-              <ul>
-                <li>Expérience avec React, Node.js, et TypeScript.</li>
-                <li>Bonne connaissance des bases de données SQL.</li>
-                <li>Esprit d'équipe et excellentes capacités de communication.</li>
-              </ul>
+              {job.qualifications && (
+                <>
+                  <h2 className="font-bold">Qualifications</h2>
+                  <div dangerouslySetInnerHTML={{ __html: job.qualifications.replace(/\n/g, '<br />') }} />
+                </>
+              )}
             </div>
           </div>
 

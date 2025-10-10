@@ -3,34 +3,66 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+import { type NextRequest } from 'next/server'
+
+export async function GET(request: NextRequest) {
   try {
+    const searchParams = request.nextUrl.searchParams;
+    const search = searchParams.get('search');
+    const location = searchParams.get('location');
+
+    const where: any = {
+      status: 'PUBLISHED',
+    };
+
+    if (search) {
+      where.OR = [
+        { title: { contains: search, mode: 'insensitive' } },
+        { description: { contains: search, mode: 'insensitive' } },
+        { shortDescription: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    if (location) {
+      where.location = { contains: location, mode: 'insensitive' };
+    }
+
     const jobs = await prisma.job.findMany({
+      where,
+      orderBy: {
+        createdAt: 'desc',
+      },
       include: {
-        company: true,
-        creator: {
-          select: { id: true, firstname: true, lastname: true, email: true },
+        company: {
+          select: {
+            compName: true,
+          },
+        },
+        _count: {
+          select: {
+            jobApplications: true,
+          },
         },
       },
-      orderBy: { createdAt: "desc" },
     });
     return NextResponse.json(jobs);
   } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Erreur lors de la récupération des offres" },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
-
   if (!session || (session.user.role !== "RECRUITER" && session.user.role !== "ADMIN")) {
     return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
   }
 
   try {
     const data = await req.json();
-    const { title, type, shortDescription, description, salary, location, companyId } = data;
+    const { title, type, shortDescription, description, responsibilities, qualifications, salary, location, companyId } = data;
 
     if (!title || !type || !shortDescription || !description || salary === undefined || !location || !companyId) {
       return NextResponse.json({ error: "Tous les champs obligatoires doivent être remplis" }, { status: 400 });
@@ -51,7 +83,9 @@ export async function POST(req: Request) {
         type,
         shortDescription,
         description,
-        salary: Number(salary), // приводим к числу
+        responsibilities,
+        qualifications,
+        salary: Number(salary) || 0,
         location,
         companyId,
         createdBy: session.user.id,

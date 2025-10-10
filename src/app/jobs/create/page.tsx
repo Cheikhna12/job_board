@@ -19,6 +19,8 @@ export default function CreateJobPage() {
     type: "CDI",
     shortDescription: "",
     description: "",
+    responsibilities: "",
+    qualifications: "",
     salary: "",
     location: "",
     companyId: "",
@@ -234,6 +236,34 @@ export default function CreateJobPage() {
                 required
                 rows={8}
                 placeholder="Décrivez en détail le poste, les responsabilités, les qualifications requises, etc."
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Responsabilités
+              </label>
+              <textarea
+                name="responsibilities"
+                value={formData.responsibilities}
+                onChange={handleChange}
+                rows={5}
+                placeholder="Listez les principales responsabilités du poste..."
+                className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-slate-700 mb-2">
+                Qualifications
+              </label>
+              <textarea
+                name="qualifications"
+                value={formData.qualifications}
+                onChange={handleChange}
+                rows={5}
+                placeholder="Listez les qualifications et compétences requises..."
                 className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-500 focus:border-transparent"
               />
             </div>

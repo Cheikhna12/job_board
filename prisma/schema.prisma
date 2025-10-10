@@ -29,6 +29,11 @@ enum ApplicationStatus {
   REFUSEE
 }
 
+enum JobStatus {
+  PUBLISHED
+  ARCHIVED
+}
+
 
 model Company {
   id          String   @id @default(cuid())
@@ -74,9 +79,12 @@ model Job {
   type             JobType
   shortDescription String   @db.Text
   description      String   @db.Text
+  responsibilities String?  @db.Text
+  qualifications   String?  @db.Text
   salary           Float
   location         String
-  categories       String[] @default([]) 
+  categories       String[] @default([])
+  status           JobStatus @default(PUBLISHED) 
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 

@@ -1,6 +1,8 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 // NOTE: Ce composant sera côté client pour gérer l'interactivité (filtres, suppression, etc.)
@@ -14,43 +16,92 @@ interface Job {
     compName: string;
   };
   type: string;
+  status: 'PUBLISHED' | 'ARCHIVED';
   _count?: {
     jobApplications: number;
   };
 }
 
-const JobRow = ({ job }: { job: Job }) => (
-  <tr className="border-b border-slate-200 hover:bg-slate-50">
-    <td className="p-4">
-      <div className="font-bold text-slate-900">{job.title}</div>
-      <div className="text-sm text-slate-500">{job.company.compName}</div>
-    </td>
-    <td className="p-4 text-slate-600">{job.type}</td>
-    <td className="p-4">
-      <span className='bg-green-100 text-green-800 px-2 py-1 text-xs font-semibold rounded-full'>
-        Publiée
-      </span>
-    </td>
-    <td className="p-4 text-slate-600">{job._count?.jobApplications || 0}</td>
-    <td className="p-4 text-right">
-      <div className="flex justify-end gap-2">
-        <Link href={`/jobs/${job.id}/edit`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</Link>
-        <button className="text-sm font-semibold text-red-600 hover:text-red-900">Archiver</button>
-      </div>
-    </td>
-  </tr>
-)
+const JobRow = ({ job, onArchive }: { job: Job; onArchive: (id: string, status: 'ARCHIVED' | 'PUBLISHED') => void }) => {
+  const isArchived = job.status === 'ARCHIVED';
 
-export default async function AdminJobsPage() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'RECRUITER')) {
-    redirect('/auth/login')
-  }
+  return (
+    <tr className={`border-b border-slate-200 hover:bg-slate-50 ${isArchived ? 'bg-slate-50 text-slate-500' : ''}`}>
+      <td className="p-4">
+        <div className={`font-bold ${isArchived ? 'text-slate-500' : 'text-slate-900'}`}>{job.title}</div>
+        <div className="text-sm text-slate-500">{job.company.compName}</div>
+      </td>
+      <td className="p-4">{job.type}</td>
+      <td className="p-4">
+        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${isArchived ? 'bg-slate-200 text-slate-600' : 'bg-green-100 text-green-800'}`}>
+          {isArchived ? 'Archivée' : 'Publiée'}
+        </span>
+      </td>
+      <td className="p-4">{job._count?.jobApplications || 0}</td>
+      <td className="p-4 text-right">
+        <div className="flex justify-end gap-2">
+          <Link href={`/admin/jobs/${job.id}/edit`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</Link>
+          <button onClick={() => onArchive(job.id, isArchived ? 'PUBLISHED' : 'ARCHIVED')} className={`text-sm font-semibold ${isArchived ? 'text-blue-600 hover:text-blue-900' : 'text-red-600 hover:text-red-900'}`}>
+            {isArchived ? 'Publier' : 'Archiver'}
+          </button>
+        </div>
+      </td>
+    </tr>
+  )
+}
 
-  // Appel API pour récupérer les offres
-  const response = await fetch('http://localhost:3000/api/jobs', { cache: 'no-store' });
-  const jobs: Job[] = await response.json();
+export default function AdminJobsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchJobs();
+    } else if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  const fetchJobs = async () => {
+    try {
+      const response = await fetch('/api/jobs');
+      if (response.ok) {
+        const data = await response.json();
+        setJobs(data);
+      } else {
+        setError('Impossible de charger les offres.');
+      }
+    } catch (err) {
+      setError('Erreur lors du chargement des offres.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleArchive = async (id: string, newStatus: 'ARCHIVED' | 'PUBLISHED') => {
+    const originalJobs = [...jobs];
+    // Optimistic UI update
+    setJobs(jobs.map(j => j.id === id ? { ...j, status: newStatus } : j));
+
+    try {
+      const response = await fetch(`/api/jobs/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        setError('Erreur lors de la mise à jour du statut.');
+        setJobs(originalJobs); // Revert on error
+      }
+    } catch (err) {
+      setError('Erreur lors de la mise à jour.');
+      setJobs(originalJobs); // Revert on error
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
@@ -58,6 +109,7 @@ export default async function AdminJobsPage() {
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Gestion des Offres</h1>
           <p className="mt-2 text-lg text-slate-600">Consultez, modifiez ou archivez les offres d'emploi.</p>
+          {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
         </div>
         <Link 
           href="/jobs/create"
@@ -80,7 +132,13 @@ export default async function AdminJobsPage() {
               </tr>
             </thead>
             <tbody>
-              {jobs.map(job => <JobRow key={job.id} job={job} />)}
+              {loading ? (
+                <tr>
+                  <td colSpan={5} className="text-center p-8">Chargement...</td>
+                </tr>
+              ) : (
+                jobs.map(job => <JobRow key={job.id} job={job} onArchive={handleArchive} />)
+              )}
             </tbody>
           </table>
         </div>

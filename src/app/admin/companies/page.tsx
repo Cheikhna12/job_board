@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 
 // Définir un type pour l'objet company
 interface Company {
@@ -16,8 +17,17 @@ interface Company {
 }
 
 async function getCompanies(): Promise<Company[]> {
+  const requestHeaders = new Headers(await headers());
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
   try {
-    const response = await fetch('http://localhost:3000/api/companies', { cache: 'no-store' });
+    const response = await fetch(`${baseUrl}/api/companies`, {
+      cache: 'no-store',
+      headers: requestHeaders,
+    });
+    if (!response.ok) {
+      console.error(`Erreur API: ${response.status} ${response.statusText}`);
+      return [];
+    }
     const data = await response.json();
     return data.data || [];
   } catch (error) {
@@ -45,7 +55,7 @@ const CompanyRow = ({ company }: { company: Company }) => (
     <td className="p-4 text-right">
       <div className="flex justify-end gap-2">
         <Link href={`/companies/${company.id}`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Voir</Link>
-        <button className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</button>
+        <Link href={`/admin/companies/${company.id}/edit`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</Link>
         <button className="text-sm font-semibold text-red-600 hover:text-red-900">Supprimer</button>
       </div>
     </td>

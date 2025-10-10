@@ -6,11 +6,13 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Début du seeding...')
 
-  // Nettoyer la base de données
-  await prisma.jobApplication.deleteMany()
-  await prisma.job.deleteMany()
-  await prisma.user.deleteMany()
-  await prisma.company.deleteMany()
+  // Nettoyer la base de données (ordre inverse des dépendances)
+  console.log('Nettoyage de la base de données...')
+  await prisma.jobApplication.deleteMany();
+  await prisma.job.deleteMany();
+  await prisma.user.deleteMany();
+  await prisma.company.deleteMany();
+  console.log('Base de données nettoyée.')
 
   // Créer des entreprises
   const companies = await Promise.all([

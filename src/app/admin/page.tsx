@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 
 // Icônes pour le dashboard
 const UsersIcon = () => (
@@ -55,11 +56,16 @@ export default async function AdminDashboard() {
   }
 
   // Appels API pour récupérer les statistiques réelles
+  const requestHeaders = new Headers(await headers());
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+
+  const apiFetch = (url: string) => fetch(url, { cache: 'no-store', headers: requestHeaders });
+
   const [jobsRes, companiesRes, usersRes, applicationsRes] = await Promise.all([
-    fetch('http://localhost:3000/api/jobs', { cache: 'no-store' }),
-    fetch('http://localhost:3000/api/companies', { cache: 'no-store' }),
-    fetch('http://localhost:3000/api/users', { cache: 'no-store' }),
-    fetch('http://localhost:3000/api/applications', { cache: 'no-store' })
+    apiFetch(`${baseUrl}/api/jobs`),
+    apiFetch(`${baseUrl}/api/companies`),
+    apiFetch(`${baseUrl}/api/users`),
+    apiFetch(`${baseUrl}/api/applications`)
   ]);
 
   const jobsData = await jobsRes.json();

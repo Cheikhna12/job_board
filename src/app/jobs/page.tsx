@@ -1,3 +1,7 @@
+'use client'
+
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 // Icônes
@@ -27,21 +31,42 @@ interface Job {
   createdAt: string;
 }
 
-async function getJobs(): Promise<Job[]> {
-  try {
-    const response = await fetch('http://localhost:3000/api/jobs', {
-      cache: 'no-store' // Pour toujours avoir les données à jour
-    })
-    if (!response.ok) return []
-    return response.json()
-  } catch (error) {
-    console.error("Impossible de récupérer les offres d'emploi:", error)
-    return []
-  }
-}
+function JobsSearch() {
+  const searchParams = useSearchParams();
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+  const [locationTerm, setLocationTerm] = useState(searchParams.get('location') || '');
 
-export default async function JobsPage() {
-  const jobs = await getJobs()
+  const fetchJobs = async (search = '', location = '') => {
+    setLoading(true);
+    try {
+      const query = new URLSearchParams({ search, location }).toString();
+      const response = await fetch(`/api/jobs?${query}`);
+      if (response.ok) {
+        const data = await response.json();
+        setJobs(data);
+      } else {
+        setJobs([]);
+      }
+    } catch (error) {
+      console.error("Impossible de récupérer les offres d'emploi:", error);
+      setJobs([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const initialSearch = searchParams.get('search') || '';
+    const initialLocation = searchParams.get('location') || '';
+    fetchJobs(initialSearch, initialLocation);
+  }, [searchParams]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    fetchJobs(searchTerm, locationTerm);
+  };
 
   return (
     <div className="min-h-screen bg-white font-sans text-slate-800">
@@ -56,7 +81,7 @@ export default async function JobsPage() {
 
         {/* Filtres */}
         <div className="mb-12 bg-white border border-slate-200 rounded-xl shadow-sm p-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <form onSubmit={handleSearch} className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="relative md:col-span-2">
               <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                 <SearchIcon />
@@ -64,6 +89,8 @@ export default async function JobsPage() {
               <input
                 type="text"
                 placeholder="Titre du poste, compétence..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800"
               />
             </div>
@@ -74,62 +101,83 @@ export default async function JobsPage() {
               <input
                 type="text"
                 placeholder="Lieu"
+                value={locationTerm}
+                onChange={(e) => setLocationTerm(e.target.value)}
                 className="w-full pl-12 pr-4 py-3 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-slate-800"
               />
             </div>
-            <button className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+            <button type="submit" className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
               Rechercher
             </button>
-          </div>
+          </form>
         </div>
 
         {/* Liste des offres */}
-        <div className="space-y-6">
-          {jobs.map((job: Job) => (
-            <Link
-              key={job.id}
-              href={`/jobs/${job.id}`}
-              className="block group"
-            >
-              <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all">
-                <div className="flex flex-col sm:flex-row items-start gap-6">
-                  <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <span className="text-2xl font-bold text-slate-800">
-                      {job.company.compName.charAt(0)}
-                    </span>
-                  </div>
-                  <div className="flex-grow">
-                    <h2 className="text-xl font-bold group-hover:text-slate-900 transition-colors">
-                      {job.title}
-                    </h2>
-                    <p className="mt-1 text-slate-600">{job.company.compName}</p>
-                    <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
-                      <span className="font-medium bg-slate-100 px-3 py-1 rounded-full">{job.type}</span>
-                      <span>{job.location}</span>
-                      {job.salary && <span className="font-semibold text-slate-800">{job.salary}€</span>}
-                    </div>
-                  </div>
-                  <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end justify-between h-full">
-                    <p className="text-sm text-slate-400">Publiée le {new Date(job.createdAt).toLocaleDateString('fr-FR')}</p>
-                    <div className="mt-4 text-slate-400 group-hover:text-slate-800 transition-colors">
-                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {jobs.length === 0 && (
-          <div className="text-center py-24 border-2 border-dashed border-slate-200 rounded-xl">
-            <h3 className="text-xl font-semibold">Aucune offre d'emploi pour le moment</h3>
-            <p className="mt-2 text-slate-500">Revenez bientôt pour découvrir de nouvelles opportunités.</p>
+        {loading ? (
+          <div className="text-center py-24">
+            <p>Chargement des offres...</p>
           </div>
+        ) : (
+          <>
+            <div className="space-y-6">
+              {jobs.map((job: Job) => (
+                <Link
+                  key={job.id}
+                  href={`/jobs/${job.id}`}
+                  className="block group"
+                >
+                  <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all">
+                    <div className="flex flex-col sm:flex-row items-start gap-6">
+                      <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <span className="text-2xl font-bold text-slate-800">
+                          {job.company.compName.charAt(0)}
+                        </span>
+                      </div>
+                      <div className="flex-grow">
+                        <h2 className="text-xl font-bold group-hover:text-slate-900 transition-colors">
+                          {job.title}
+                        </h2>
+                        <p className="mt-1 text-slate-600">{job.company.compName}</p>
+                        <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
+                          <span className="font-medium bg-slate-100 px-3 py-1 rounded-full">{job.type}</span>
+                          <span>{job.location}</span>
+                          {job.salary && <span className="font-semibold text-slate-800">{job.salary}€</span>}
+                        </div>
+                      </div>
+                      <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end justify-between h-full">
+                        <p className="text-sm text-slate-400">Publiée le {new Date(job.createdAt).toLocaleDateString('fr-FR')}</p>
+                        <div className="mt-4">
+                          <span className="inline-flex items-center px-4 py-2 bg-slate-100 group-hover:bg-slate-800 text-slate-600 group-hover:text-white text-sm font-semibold rounded-lg transition-colors">
+                            Voir les détails
+                            <svg className="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              ))}
+            </div>
+
+            {!loading && jobs.length === 0 && (
+              <div className="text-center py-24 border-2 border-dashed border-slate-200 rounded-xl">
+                <h3 className="text-xl font-semibold">Aucune offre d'emploi ne correspond à votre recherche</h3>
+                <p className="mt-2 text-slate-500">Essayez d'autres mots-clés ou élargissez votre recherche.</p>
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
+  )
+}
+
+export default function JobsPage() {
+  return (
+    <Suspense fallback={<div>Chargement...</div>}>
+      <JobsSearch />
+    </Suspense>
   )
 }

@@ -1,5 +1,7 @@
 'use client'
 
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 
@@ -33,6 +35,15 @@ const PlaceholderImage = () => (
 
 export default function Home() {
   const { data: session, status } = useSession()
+  const router = useRouter()
+  const [searchTerm, setSearchTerm] = useState('')
+  const [locationTerm, setLocationTerm] = useState('')
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault()
+    const query = new URLSearchParams({ search: searchTerm, location: locationTerm }).toString()
+    router.push(`/jobs?${query}`)
+  }
 
   if (status === 'loading') {
     return (
@@ -58,12 +69,14 @@ export default function Home() {
               </p>
               
               {/* Barre de recherche épurée */}
-              <div className="mt-10 bg-white border border-slate-200 rounded-xl shadow-sm p-2 flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto lg:mx-0">
+              <form onSubmit={handleSearch} className="mt-10 bg-white border border-slate-200 rounded-xl shadow-sm p-2 flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto lg:mx-0">
                 <div className="flex-1 flex items-center px-4">
                   <SearchIcon />
                   <input 
                     type="text" 
                     placeholder="Compétence ou titre de poste"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
                     className="w-full ml-3 py-3 bg-transparent outline-none placeholder:text-slate-400"
                   />
                 </div>
@@ -72,16 +85,18 @@ export default function Home() {
                   <input 
                     type="text" 
                     placeholder="Ville ou pays"
+                    value={locationTerm}
+                    onChange={(e) => setLocationTerm(e.target.value)}
                     className="w-full ml-3 py-3 bg-transparent outline-none placeholder:text-slate-400"
                   />
                 </div>
-                <Link
-                  href="/jobs"
+                <button
+                  type="submit"
                   className="bg-slate-800 hover:bg-slate-900 text-white px-8 py-3 rounded-lg font-semibold transition-colors"
                 >
                   Rechercher
-                </Link>
-              </div>
+                </button>
+              </form>
             </div>
 
             {/* Grille d'images épurée */}

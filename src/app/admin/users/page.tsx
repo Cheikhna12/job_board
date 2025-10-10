@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { headers } from 'next/headers'
 
 // NOTE: Données factices. Une implémentation réelle utiliserait un appel API.
 
@@ -50,33 +51,30 @@ const UserRow = ({ user }: { user: User }) => (
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions)
   
-  // Debug: Log de la session dans la page admin
-  console.log('=== PAGE ADMIN DEBUG ===')
-  console.log('Session dans page admin:', JSON.stringify(session, null, 2))
-  console.log('Rôle utilisateur dans page:', session?.user?.role)
-  console.log('Type du rôle dans page:', typeof session?.user?.role)
-  
   // Seuls les admins peuvent voir cette page
   if (!session || session.user.role !== 'ADMIN') {
-    console.log('Redirection vers /admin - Session:', !!session, 'Rôle:', session?.user?.role)
     redirect('/admin') // ou une page d'accès refusé
   }
 
   // Appel API pour récupérer les utilisateurs
+  const requestHeaders = new Headers(await headers());
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
-  const response = await fetch(`${baseUrl}/api/users`, { cache: 'no-store' });
-  
-  console.log('Response status:', response.status);
-  console.log('Response headers:', response.headers);
-  
+  const response = await fetch(`${baseUrl}/api/users`, {
+    cache: 'no-store',
+    headers: requestHeaders,
+  });
+
   if (!response.ok) {
-    console.error('Erreur API:', response.status, response.statusText);
-    const errorText = await response.text();
-    console.error('Erreur détails:', errorText);
+    // Gérer l'erreur, par exemple en affichant un message à l'utilisateur
+    // Pour l'instant, nous allons simplement logguer l'erreur côté serveur
+    console.error(`Erreur API: ${response.status} ${response.statusText}`);
+    const errorBody = await response.text();
+    console.error('Détails de l\'erreur:', errorBody);
+    // Retourner une liste vide pour éviter de faire planter la page
+    return <div>Erreur lors du chargement des utilisateurs.</div>;
   }
-  
+
   const usersData = await response.json();
-  console.log('Users data received:', usersData);
   const users: User[] = usersData.data || [];
 
   return (
