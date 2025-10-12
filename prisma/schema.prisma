@@ -107,6 +107,7 @@ model JobApplication {
   applicantEmail String
   applicantPhone String?
   status         ApplicationStatus @default(EN_ATTENTE)
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 

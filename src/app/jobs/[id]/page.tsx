@@ -31,8 +31,9 @@ async function getJobDetails(id: string): Promise<JobDetails | null> {
   }
 }
 
-export default async function JobDetailsPage({ params }: { params: { id: string } }) {
-  const job = await getJobDetails(params.id)
+export default async function JobDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const job = await getJobDetails(id)
 
   if (!job) {
     return (

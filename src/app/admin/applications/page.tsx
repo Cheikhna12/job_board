@@ -1,7 +1,11 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
-import { redirect } from 'next/navigation'
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { ApplicationStatus } from '@prisma/client'
+import Loader from '@/components/ui/Loader'
 
 // Définir un type pour l'objet application
 interface Application {
@@ -16,18 +20,8 @@ interface Application {
   createdAt: string;
 }
 
-async function getApplications(): Promise<Application[]> {
-  try {
-    const response = await fetch('http://localhost:3000/api/applications', { cache: 'no-store' });
-    if (!response.ok) return [];
-    return response.json();
-  } catch (error) {
-    console.error("Impossible de récupérer les candidatures:", error);
-    return [];
-  }
-}
 
-const ApplicationRow = ({ application }: { application: Application }) => (
+const ApplicationRow = ({ application, onStatusChange }: { application: Application; onStatusChange: (id: string, status: ApplicationStatus) => void }) => (
   <tr className="border-b border-slate-200 hover:bg-slate-50">
     <td className="p-4">
       <div className="font-bold text-slate-900">{application.applicantName}</div>
@@ -46,21 +40,71 @@ const ApplicationRow = ({ application }: { application: Application }) => (
     <td className="p-4 text-slate-600">{new Date(application.createdAt).toLocaleDateString('fr-FR')}</td>
     <td className="p-4 text-right">
       <div className="flex justify-end gap-2">
-        <button className="text-sm font-semibold text-slate-600 hover:text-slate-900">Voir</button>
-        <button className="text-sm font-semibold text-slate-600 hover:text-slate-900">Changer Statut</button>
+        <select
+          value={application.status}
+          onChange={(e) => onStatusChange(application.id, e.target.value as ApplicationStatus)}
+          className="text-sm font-semibold text-slate-600 hover:text-slate-900 bg-transparent border-none"
+        >
+          <option value="EN_ATTENTE">En attente</option>
+          <option value="ACCEPTEE">Acceptée</option>
+          <option value="REFUSEE">Refusée</option>
+        </select>
       </div>
     </td>
   </tr>
-)
+);
 
-export default async function AdminApplicationsPage() {
-  const session = await getServerSession(authOptions)
-  
-  if (!session || (session.user.role !== 'ADMIN' && session.user.role !== 'RECRUITER')) {
-    redirect('/auth/login')
-  }
+export default function AdminApplicationsPage() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const applications = await getApplications();
+  useEffect(() => {
+    if (status === 'authenticated') {
+      fetchApplications();
+    } else if (status === 'unauthenticated') {
+      router.push('/auth/login');
+    }
+  }, [status, router]);
+
+  const fetchApplications = async () => {
+    try {
+      const response = await fetch('/api/applications');
+      if (response.ok) {
+        const data = await response.json();
+        setApplications(data);
+      } else {
+        setError('Impossible de charger les candidatures.');
+      }
+    } catch (err) {
+      setError('Erreur lors du chargement des candidatures.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id: string, newStatus: ApplicationStatus) => {
+    const originalApplications = [...applications];
+    setApplications(applications.map(app => app.id === id ? { ...app, status: newStatus } : app));
+
+    try {
+      const response = await fetch(`/api/applications/${id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        setError('Erreur lors de la mise à jour du statut.');
+        setApplications(originalApplications);
+      }
+    } catch (err) {
+      setError('Erreur lors de la mise à jour.');
+      setApplications(originalApplications);
+    }
+  };
 
   return (
     <div className="max-w-7xl mx-auto px-6 lg:px-8 py-12">
@@ -82,7 +126,13 @@ export default async function AdminApplicationsPage() {
               </tr>
             </thead>
             <tbody>
-              {applications.map((app) => <ApplicationRow key={app.id} application={app} />)}
+              {loading ? (
+                <tr>
+                  <td colSpan={5}><Loader text="Chargement des candidatures..." /></td>
+                </tr>
+              ) : (
+                applications.map((app) => <ApplicationRow key={app.id} application={app} onStatusChange={handleStatusChange} />)
+              )}
             </tbody>
           </table>
         </div>

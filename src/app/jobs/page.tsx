@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Loader from '@/components/ui/Loader'
 
 // Icônes
 const SearchIcon = () => (
@@ -114,9 +115,7 @@ function JobsSearch() {
 
         {/* Liste des offres */}
         {loading ? (
-          <div className="text-center py-24">
-            <p>Chargement des offres...</p>
-          </div>
+          <Loader text="Chargement des offres..." />
         ) : (
           <>
             <div className="space-y-6">
@@ -176,7 +175,7 @@ function JobsSearch() {
 
 export default function JobsPage() {
   return (
-    <Suspense fallback={<div>Chargement...</div>}>
+    <Suspense fallback={<Loader />}>
       <JobsSearch />
     </Suspense>
   )

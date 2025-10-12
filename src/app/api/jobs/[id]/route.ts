@@ -3,10 +3,11 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await context.params;
     const job = await prisma.job.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { company: true, creator: true, jobApplications: true },
     });
 
@@ -20,7 +21,8 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 }
 
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const session = await getServerSession(authOptions);
 
   if (!session || (session.user.role !== "RECRUITER" && session.user.role !== "ADMIN")) {
@@ -30,7 +32,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   try {
     const data = await req.json();
     const updatedJob = await prisma.job.update({
-      where: { id: params.id },
+      where: { id },
       data,
     });
     return NextResponse.json(updatedJob);
@@ -41,7 +43,8 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(_req: Request, context: { params: Promise<{ id: string }> }) {
+  const { id } = await context.params;
   const session = await getServerSession(authOptions);
 
   if (!session || (session.user.role !== "RECRUITER" && session.user.role !== "ADMIN")) {
@@ -49,7 +52,7 @@ export async function DELETE(_req: Request, { params }: { params: { id: string }
   }
 
   try {
-    await prisma.job.delete({ where: { id: params.id } });
+    await prisma.job.delete({ where: { id } });
     return NextResponse.json({ message: "Offre supprimée" });
   } catch (error) {
     console.error(error);

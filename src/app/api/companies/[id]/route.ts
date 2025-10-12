@@ -15,10 +15,10 @@ const updateCompanySchema = z.object({
 // GET /api/companies/[id] - Détails d'une entreprise
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params
+    const { id } = await context.params
 
     // Vérifier que l'ID est valide
     if (!id) {
@@ -92,11 +92,11 @@ export async function GET(
 // PUT /api/companies/[id] - Modifier une entreprise
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params
     const session = await getServerSession(authOptions)
-    const { id } = params
 
     // Vérifier l'authentification
     if (!session || !session.user) {
@@ -204,11 +204,11 @@ export async function PUT(
 // DELETE /api/companies/[id] - Supprimer une entreprise (ADMIN seulement)
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await context.params
     const session = await getServerSession(authOptions)
-    const { id } = params
 
     // Vérifier l'authentification et les permissions
     if (!session || !session.user) {

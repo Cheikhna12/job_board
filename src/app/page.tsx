@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
+import Loader from '@/components/ui/Loader'
 
 // Icônes SVG pour une touche de légèreté
 const SearchIcon = () => (
@@ -46,11 +47,7 @@ export default function Home() {
   }
 
   if (status === 'loading') {
-    return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-slate-800"></div>
-      </div>
-    )
+    return <Loader text="Chargement de la session..." />;
   }
 
   return (

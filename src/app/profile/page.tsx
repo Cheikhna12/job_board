@@ -38,7 +38,7 @@ export default function ProfilePage() {
       const response = await fetch(`/api/users/${session?.user?.id}`)
       if (response.ok) {
         const result = await response.json()
-        setProfile(result.data)
+        setProfile(result)
       } else {
         setError('Impossible de charger le profil')
       }

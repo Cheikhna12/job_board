@@ -40,7 +40,7 @@ const JobRow = ({ job, onArchive }: { job: Job; onArchive: (id: string, status: 
       <td className="p-4">{job._count?.jobApplications || 0}</td>
       <td className="p-4 text-right">
         <div className="flex justify-end gap-2">
-          <Link href={`/admin/jobs/${job.id}/edit`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</Link>
+          <Link href={`/jobs/${job.id}/edit`} className="text-sm font-semibold text-slate-600 hover:text-slate-900">Modifier</Link>
           <button onClick={() => onArchive(job.id, isArchived ? 'PUBLISHED' : 'ARCHIVED')} className={`text-sm font-semibold ${isArchived ? 'text-blue-600 hover:text-blue-900' : 'text-red-600 hover:text-red-900'}`}>
             {isArchived ? 'Publier' : 'Archiver'}
           </button>

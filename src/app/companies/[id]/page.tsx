@@ -22,9 +22,10 @@ const PlaceholderLogo = ({ letter }: { letter: string }) => (
   </div>
 )
 
-export default async function CompanyDetailsPage({ params }: { params: { id: string } }) {
+export default async function CompanyDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const response = await fetch(
-    `http://localhost:3000/api/companies/${params.id}`,
+    `http://localhost:3000/api/companies/${id}`,
     { cache: 'no-store' }
   )
   const data = await response.json()
