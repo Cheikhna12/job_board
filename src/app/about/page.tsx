@@ -9,21 +9,21 @@ const developers = [
     role: 'Lead Developer & Architect',
     bio: 'Architecte de solutions, je conçois des systèmes robustes et évolutifs. Ma passion est de transformer des idées complexes en réalités techniques performantes, en construisant les fondations solides sur lesquelles reposent nos projets.',
     quote: 'La meilleure architecture est celle qui semble invisible.',
-    imageUrl: '/placeholder-dev.svg',
+    imageUrl: '/dev1.jpeg',
   },
   {
     name: 'Développeur Deux',
     role: 'Frontend Specialist & UI/UX Enthusiast',
     bio: 'Focalisé sur l\'expérience utilisateur, je donne vie aux interfaces. Je m\'efforce de créer des parcours intuitifs et esthétiques, où chaque détail et chaque animation contribuent à une interaction mémorable et fluide.',
     quote: 'Un bon design est un design qui sert l\'humain.',
-    imageUrl: '/placeholder-dev.svg',
+    imageUrl: '/dev2.JPG',
   },
   {
     name: 'Développeur Trois',
     role: 'Backend Engineer & DevOps Pro',
     bio: 'Gardien de la performance et de la fiabilité, je travaille en coulisses pour que tout fonctionne sans accroc. De la base de données à l\'infrastructure, ma mission est d\'assurer une exécution rapide et sécurisée.',
     quote: 'La complexité en backend doit aboutir à la simplicité en frontend.',
-    imageUrl: '/placeholder-dev.svg',
+    imageUrl: '/dev3.JPG',
   },
 ]
 
@@ -67,6 +67,9 @@ const DeveloperSection = ({ dev, index }: { dev: typeof developers[0], index: nu
           src={dev.imageUrl}
           alt={`Photo de ${dev.name}`}
           fill
+          quality={100}
+          priority={index === 0}
+          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 448px"
           className="object-cover rounded-2xl shadow-2xl"
         />
       </div>

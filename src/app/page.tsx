@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Loader from '@/components/ui/Loader'
+import { TypeAnimation } from 'react-type-animation'
 
 // Icônes SVG pour une touche de légèreté
 const SearchIcon = () => (
@@ -26,13 +27,60 @@ const ArrowRightIcon = () => (
   </svg>
 )
 
-const PlaceholderImage = () => (
-  <div className="aspect-square bg-slate-100 border border-slate-200 rounded-full flex items-center justify-center">
-    <svg className="w-1/3 h-1/3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-    </svg>
+const ProfileImage = ({ src }: { src: string }) => (
+  <div className="aspect-square rounded-full overflow-hidden border-2 border-slate-200">
+    <img 
+      src={src} 
+      alt="Professional profile" 
+      className="w-full h-full object-cover"
+    />
   </div>
 )
+
+const CompanyCarousel = () => {
+  const companies = [
+    { name: 'Google', logo: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png' },
+    { name: 'Microsoft', logo: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31' },
+    { name: 'Slack', logo: 'https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png' },
+    { name: 'Shopify', logo: 'https://cdn.shopify.com/shopifycloud/brochure/assets/brand-assets/shopify-logo-primary-logo-456baa801ee66a0a435671082365958316831c9960c480451dd0330bcdae304f.svg' },
+    { name: 'Stripe', logo: 'https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg?q=80&w=1082' },
+    { name: 'Airbnb', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Airbnb_Logo_B%C3%A9lo.svg' },
+    { name: 'Spotify', logo: 'https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png' },
+    { name: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' },
+  ]
+
+  const [currentIndex, setCurrentIndex] = useState(0)
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % Math.ceil(companies.length / 5))
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="relative overflow-hidden">
+      <div 
+        className="flex transition-transform duration-700 ease-in-out"
+        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+      >
+        {Array.from({ length: Math.ceil(companies.length / 5) }).map((_, slideIndex) => (
+          <div key={slideIndex} className="min-w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
+            {companies.slice(slideIndex * 5, (slideIndex + 1) * 5).map((company) => (
+              <div key={company.name} className="flex items-center justify-center p-6 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-all grayscale hover:grayscale-0">
+                <img 
+                  src={company.logo} 
+                  alt={company.name} 
+                  className="max-h-12 w-auto object-contain"
+                />
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -58,8 +106,20 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight">
-                Trouvez l'expert qui transformera votre projet.
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight min-h-[180px] sm:min-h-[210px] lg:min-h-[240px]">
+                <TypeAnimation
+                  sequence={[
+                    'Trouvez l\'expert qui transformera votre projet.',
+                    3000,
+                    'Trouvez le talent qui fera la différence.',
+                    3000,
+                    'Trouvez le professionnel idéal pour votre équipe.',
+                    3000,
+                  ]}
+                  wrapper="span"
+                  speed={50}
+                  repeat={Infinity}
+                />
               </h1>
               <p className="mt-6 text-lg text-slate-600 max-w-xl mx-auto lg:mx-0">
                 Recherchez parmi des milliers de profils qualifiés et trouvez le talent parfait pour chaque mission, du design à la programmation.
@@ -99,17 +159,17 @@ export default function Home() {
             {/* Grille d'images épurée */}
             <div className="hidden lg:grid grid-cols-3 gap-4">
               <div className="space-y-4 pt-16">
-                <PlaceholderImage />
-                <PlaceholderImage />
+                <ProfileImage src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=400&fit=crop" />
+                <ProfileImage src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop" />
               </div>
               <div className="space-y-4">
-                <PlaceholderImage />
-                <PlaceholderImage />
-                <PlaceholderImage />
+                <ProfileImage src="https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop" />
+                <ProfileImage src="https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&h=400&fit=crop" />
+                <ProfileImage src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop" />
               </div>
               <div className="space-y-4 pt-24">
-                <PlaceholderImage />
-                <PlaceholderImage />
+                <ProfileImage src="https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&h=400&fit=crop" />
+                <ProfileImage src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop" />
               </div>
             </div>
           </div>
@@ -145,10 +205,12 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="w-full h-auto aspect-video bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center">
-                <svg className="w-1/4 h-1/4 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
-                </svg>
+              <div className="w-full h-auto aspect-video rounded-xl overflow-hidden border border-slate-200">
+                <img 
+                  src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=450&fit=crop" 
+                  alt="Équipe professionnelle en réunion" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
             <div>
@@ -172,12 +234,8 @@ export default function Home() {
             <p className="mt-4 text-lg text-slate-600">Des entreprises innovantes nous font confiance pour trouver leurs futurs collaborateurs.</p>
           </div>
 
-          <div className="mt-16 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
-            {['Google', 'ShipBob', 'Dribbble', 'Slack', 'Vine'].map((company) => (
-              <div key={company} className="text-center text-2xl font-semibold text-slate-400 grayscale hover:grayscale-0 transition-all">
-                {company}
-              </div>
-            ))}
+          <div className="mt-16">
+            <CompanyCarousel />
           </div>
         </div>
       </section>
