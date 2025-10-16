@@ -10,8 +10,6 @@ interface JobDetails {
   };
   location: string;
   description: string;
-  responsibilities?: string;
-  qualifications?: string;
   createdAt: string;
   type: string;
   salary?: number | string;
@@ -72,21 +70,7 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
 
             <div className="prose prose-lg max-w-none text-slate-700 leading-relaxed">
               <h2 className="font-bold">Description du poste</h2>
-              <p>{job.description}</p>
-
-              {job.responsibilities && (
-                <>
-                  <h2 className="font-bold">Responsabilités</h2>
-                  <div dangerouslySetInnerHTML={{ __html: job.responsibilities.replace(/\n/g, '<br />') }} />
-                </>
-              )}
-
-              {job.qualifications && (
-                <>
-                  <h2 className="font-bold">Qualifications</h2>
-                  <div dangerouslySetInnerHTML={{ __html: job.qualifications.replace(/\n/g, '<br />') }} />
-                </>
-              )}
+              <p className='whitespace-pre-line'>{job.description}</p>
             </div>
           </div>
 
@@ -118,10 +102,12 @@ export default async function JobDetailsPage({ params }: { params: Promise<{ id:
                       <span className="font-medium text-slate-800">{job.salary}€ / an</span>
                     </li>
                   )}
+                  {/*
                   <li className="flex items-start">
                     <span className="font-semibold w-24 flex-shrink-0">Secteur</span>
                     <span className="font-medium text-slate-800">Technologie</span>
                   </li>
+                  */}
                 </ul>
               </div>
             </div>

@@ -27,6 +27,7 @@ interface Job {
     compName: string;
   };
   type: string;
+  shortDescription: string;
   location: string;
   salary?: number | string;
   createdAt: string;
@@ -120,11 +121,6 @@ function JobsSearch() {
           <>
             <div className="space-y-6">
               {jobs.map((job: Job) => (
-                <Link
-                  key={job.id}
-                  href={`/jobs/${job.id}`}
-                  className="block group"
-                >
                   <div className="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all">
                     <div className="flex flex-col sm:flex-row items-start gap-6">
                       <div className="w-16 h-16 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -137,6 +133,7 @@ function JobsSearch() {
                           {job.title}
                         </h2>
                         <p className="mt-1 text-slate-600">{job.company.compName}</p>
+                        <p className="w-full sm:w-3/4 md:w-1/2 lg:w-1/3 xl:w-1/4 mt-1 text-slate-600 tracking-tight line-clamp-1">{job.shortDescription}</p>
                         <div className="mt-3 flex items-center gap-4 text-sm text-slate-500">
                           <span className="font-medium bg-slate-100 px-3 py-1 rounded-full">{job.type}</span>
                           <span>{job.location}</span>
@@ -146,17 +143,22 @@ function JobsSearch() {
                       <div className="mt-4 sm:mt-0 flex flex-col items-start sm:items-end justify-between h-full">
                         <p className="text-sm text-slate-400">Publiée le {new Date(job.createdAt).toLocaleDateString('fr-FR')}</p>
                         <div className="mt-4">
+                          <Link
+                            key={job.id}
+                            href={`/jobs/${job.id}`}
+                            className="block group"
+                          >
                           <span className="inline-flex items-center px-4 py-2 bg-slate-100 group-hover:bg-slate-800 text-slate-600 group-hover:text-white text-sm font-semibold rounded-lg transition-colors">
                             Voir les détails
                             <svg className="w-5 h-5 ml-2 -mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
                             </svg>
                           </span>
+                          </Link>
                         </div>
                       </div>
                     </div>
                   </div>
-                </Link>
               ))}
             </div>
 

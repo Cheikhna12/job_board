@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Link from 'next/link'
 import Loader from '@/components/ui/Loader'
-import { TypeAnimation } from 'react-type-animation'
+import Carousel from 'react-multi-carousel'
+import 'react-multi-carousel/lib/styles.css'
 
 // Icônes SVG pour une touche de légèreté
 const SearchIcon = () => (
@@ -37,50 +38,69 @@ const ProfileImage = ({ src }: { src: string }) => (
   </div>
 )
 
+const words = [
+  { text: "évoluez", color: "bg-red-500", delay: "0s" },
+  { text: "explorez", color: "bg-lime-700", delay: "3s" },
+  { text: "brillez", color: "bg-indigo-700", delay: "6s" },
+  { text: "avancez", color: "bg-fuchsia-800", delay: "9s" },
+];
+
+const TitleAnimation = () => (
+  <span className="relative inline-block h-12 w-40 sm:h-12 sm:w-55 lg:h-19 lg:w-70 ml-2 overflow-hidden align-bottom">
+    {words.map((word, i) => (
+      <span
+        key={i}
+        className={`absolute top-0 left-0 inline-block px-2 text-white box-decoration-slice animate-slide-words ${word.color}`}
+        style={{ animationDelay: word.delay }}
+      >
+        {word.text}
+      </span>
+    ))}
+  </span>
+);
+
 const CompanyCarousel = () => {
   const companies = [
-    { name: 'Google', logo: 'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png' },
-    { name: 'Microsoft', logo: 'https://img-prod-cms-rt-microsoft-com.akamaized.net/cms/api/am/imageFileData/RE1Mu3b?ver=5c31' },
-    { name: 'Slack', logo: 'https://a.slack-edge.com/80588/marketing/img/icons/icon_slack_hash_colored.png' },
-    { name: 'Shopify', logo: 'https://cdn.shopify.com/shopifycloud/brochure/assets/brand-assets/shopify-logo-primary-logo-456baa801ee66a0a435671082365958316831c9960c480451dd0330bcdae304f.svg' },
-    { name: 'Stripe', logo: 'https://images.ctfassets.net/fzn2n1nzq965/HTTOloNPhisV9P4hlMPNA/cacf1bb88b9fc492dfad34378d844280/Stripe_icon_-_square.svg?q=80&w=1082' },
-    { name: 'Airbnb', logo: 'https://upload.wikimedia.org/wikipedia/commons/6/69/Airbnb_Logo_B%C3%A9lo.svg' },
-    { name: 'Spotify', logo: 'https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png' },
-    { name: 'Netflix', logo: 'https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg' },
-  ]
+    { name: 'Google', logo: '/logos/Google.png' },
+    { name: 'Microsoft', logo: '/logos/Microsoft.png' },
+    { name: 'Slack', logo: '/logos/Slack.png' },
+    { name: 'Shopify', logo: '/logos/Shopify.png' },
+    { name: 'Stripe', logo: '/logos/Stripe.png' },
+    { name: 'Airbnb', logo: '/logos/Airbnb.png' },
+    { name: 'Spotify', logo: '/logos/Spotify.png' },
+    { name: 'Netflix', logo: '/logos/Netflix.png' },
+  ];
 
-  const [currentIndex, setCurrentIndex] = useState(0)
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % Math.ceil(companies.length / 5))
-    }, 3000)
-    return () => clearInterval(interval)
-  }, [])
+  const responsive = {
+    superLargeDesktop: { breakpoint: { max: 4000, min: 1536 }, items: 5 },
+    desktop: { breakpoint: { max: 1536, min: 1024 }, items: 4 },
+    tablet: { breakpoint: { max: 1024, min: 640 }, items: 3 },
+    mobile: { breakpoint: { max: 640, min: 0 }, items: 2 },
+  };
 
   return (
-    <div className="relative overflow-hidden">
-      <div 
-        className="flex transition-transform duration-700 ease-in-out"
-        style={{ transform: `translateX(-${currentIndex * 100}%)` }}
-      >
-        {Array.from({ length: Math.ceil(companies.length / 5) }).map((_, slideIndex) => (
-          <div key={slideIndex} className="min-w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8">
-            {companies.slice(slideIndex * 5, (slideIndex + 1) * 5).map((company) => (
-              <div key={company.name} className="flex items-center justify-center p-6 bg-white rounded-lg border border-slate-200 hover:shadow-md transition-all grayscale hover:grayscale-0">
-                <img 
-                  src={company.logo} 
-                  alt={company.name} 
-                  className="max-h-12 w-auto object-contain"
-                />
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    </div>
-  )
-}
+    <Carousel
+      responsive={responsive}
+      infinite={true}
+      autoPlay={true}
+      autoPlaySpeed={2000}
+      keyBoardControl={true}
+      showDots={false}
+      arrows={true}
+      containerClass="px-1"
+      itemClass="flex justify-center"
+    >
+      {companies.map((company) => (
+        <div 
+          key={company.name} 
+          className="flex items-center justify-center p-10 bg-white rounded-lg border border-slate-200 transition delay-80 duration-400 ease-in-out hover:shadow-md hover:scale-105 grayscale hover:grayscale-0"
+        >
+          <img src={company.logo} alt={company.name} className="max-h-16 w-auto object-contain" />
+        </div>
+      ))}
+    </Carousel>
+  );
+};
 
 export default function Home() {
   const { data: session, status } = useSession()
@@ -106,23 +126,11 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="text-center lg:text-left">
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight leading-tight min-h-[180px] sm:min-h-[210px] lg:min-h-[240px]">
-                <TypeAnimation
-                  sequence={[
-                    'Trouvez l\'expert qui transformera votre projet.',
-                    3000,
-                    'Trouvez le talent qui fera la différence.',
-                    3000,
-                    'Trouvez le professionnel idéal pour votre équipe.',
-                    3000,
-                  ]}
-                  wrapper="span"
-                  speed={50}
-                  repeat={Infinity}
-                />
+              <h1 className="text-4xl sm:text-4xl lg:text-6xl font-bold tracking-tight leading-tight text-center">
+                Trouvez, postulez,<span><TitleAnimation /></span>
               </h1>
               <p className="mt-6 text-lg text-slate-600 max-w-xl mx-auto lg:mx-0">
-                Recherchez parmi des milliers de profils qualifiés et trouvez le talent parfait pour chaque mission, du design à la programmation.
+                Recherchez parmi des milliers d'offres alléchantes et de profils qualifiés.
               </p>
               
               {/* Barre de recherche épurée */}
@@ -176,7 +184,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Section Catégories */}
+      {/* Section Catégories
       <section className="py-24 bg-slate-50">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="text-center">
@@ -199,13 +207,14 @@ export default function Home() {
           </div>
         </div>
       </section>
+      */}
 
       {/* Section "Comment ça marche ?" */}
       <section className="py-24">
         <div className="max-w-7xl mx-auto px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div>
-              <div className="w-full h-auto aspect-video rounded-xl overflow-hidden border border-slate-200">
+              <div className="w-full h-auto aspect-video bg-slate-100 border border-slate-200 rounded-xl flex items-center justify-center">
                 <img 
                   src="https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=800&h=450&fit=crop" 
                   alt="Équipe professionnelle en réunion" 
@@ -214,13 +223,11 @@ export default function Home() {
               </div>
             </div>
             <div>
-              <h2 className="text-3xl sm:text-4xl font-bold">Un monde de talents à portée de main.</h2>
-              <p className="mt-6 text-lg text-slate-600">Notre processus simplifié vous permet de trouver et recruter les meilleurs profils en quelques étapes simples, avec des paiements sécurisés et une transparence totale.</p>
-              <ul className="mt-8 space-y-4 text-slate-600">
-                <li className="flex items-start"><span className="inline-block w-2 h-2 bg-slate-800 rounded-full mt-2 mr-3 flex-shrink-0"></span>Recherche transparente et efficace</li>
-                <li className="flex items-start"><span className="inline-block w-2 h-2 bg-slate-800 rounded-full mt-2 mr-3 flex-shrink-0"></span>Recrutez les meilleurs talents</li>
-                <li className="flex items-start"><span className="inline-block w-2 h-2 bg-slate-800 rounded-full mt-2 mr-3 flex-shrink-0"></span>Paiements protégés à chaque étape</li>
-              </ul>
+              <h2 className="text-3xl sm:text-4xl font-bold text-center">Un monde d’opportunités, à portée de main.</h2>
+              <p className="mt-6 text-lg text-slate-600 text-justify">
+                Sur PortailJob, tout est pensé pour vous faire gagner du temps. <span className='font-normal underline decoration-blue-700 decoration-3'>Créez</span> votre profil, <span className='font-normal underline decoration-blue-700 decoration-3'>explorez</span> les offres ou les profils disponibles, <span className='font-normal underline decoration-blue-700 decoration-3'>entrez en contact</span> directement et <span className='font-normal underline decoration-blue-700 decoration-3'>collaborez</span> en toute confiance.
+                Chaque étape du processus est simple, transparente et sécurisée.
+              </p>
             </div>
           </div>
         </div>
@@ -243,7 +250,7 @@ export default function Home() {
       {/* Section Appel à l'action (CTA) */}
       <section className="py-24">
         <div className="max-w-4xl mx-auto px-6 lg:px-8 text-center">
-          <h2 className="text-3xl sm:text-4xl font-bold">Prêt à trouver votre prochain talent ?</h2>
+          <h2 className="text-3xl sm:text-4xl font-bold">Prêt à trouver le bon profil ?</h2>
           <p className="mt-4 text-lg text-slate-600">Publiez une offre d'emploi et recevez des candidatures qualifiées en quelques heures.</p>
           <div className="mt-8">
             <Link

@@ -17,3 +17,26 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@layer utilities {
+  @keyframes slide {
+    0%, 15% { transform: translateY(100%); opacity: 0; }
+    20%, 40% { transform: translateY(0); opacity: 1; }
+    45%, 100% { transform: translateY(-100%); opacity: 0; }
+  }
+
+  .animate-slide-words {
+    opacity: 0;
+    animation: slide 12s linear infinite;
+    animation-fill-mode: backwards;
+  }
+
+  @keyframes slideMenuOut {
+    0%, 1% { transform: translateX(100%); opacity: 0; }
+    15%, 100% { transform: translateX(0); opacity: 1; }
+  }
+
+  .animate-mobile-menu-out {
+    animation: slideMenuOut 4s linear;
+  }
+}
