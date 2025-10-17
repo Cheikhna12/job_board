@@ -45,8 +45,7 @@ export default function EditProfilePage() {
     try {
       const response = await fetch(`/api/users/${session?.user?.id}`)
       if (response.ok) {
-        const result = await response.json()
-        const profile: UserProfile = result.data
+        const profile: UserProfile = await response.json()
         setFormData({
           firstname: profile.firstname,
           lastname: profile.lastname,
