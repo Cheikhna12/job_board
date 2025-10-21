@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { getBaseUrl } from '@/lib/api-url'
 
 // Icônes SVG
 const SearchIcon = () => (
@@ -29,7 +30,8 @@ const PlaceholderLogo = ({ letter }: { letter: string }) => (
 )
 
 export default async function CompaniesPage() {
-  const response = await fetch('http://localhost:3000/api/companies', {
+  const baseUrl = getBaseUrl()
+  const response = await fetch(`${baseUrl}/api/companies`, {
     cache: 'no-store'
   })
   const data = await response.json()

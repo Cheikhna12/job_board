@@ -13,6 +13,10 @@ const swaggerDefinition = {
   },
   servers: [
     {
+      url: 'https://job-board-aac.vercel.app',
+      description: 'Serveur de production',
+    },
+    {
       url: 'http://localhost:3000',
       description: 'Serveur de développement',
     },

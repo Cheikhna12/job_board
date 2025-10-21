@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import JobApplicationSection from '@/components/JobApplicationSection'
+import { getBaseUrl } from '@/lib/api-url'
 
 interface JobDetails {
   id: string;
@@ -17,7 +18,7 @@ interface JobDetails {
 
 async function getJobDetails(id: string): Promise<JobDetails | null> {
   try {
-    const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+    const baseUrl = getBaseUrl()
     const response = await fetch(`${baseUrl}/api/jobs/${id}`, {
       cache: 'no-store'
     })

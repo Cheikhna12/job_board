@@ -3,6 +3,7 @@ import { authOptions } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { headers } from 'next/headers'
+import { getBaseUrl } from '@/lib/api-url'
 
 // Icônes pour le dashboard
 const UsersIcon = () => (
@@ -57,7 +58,7 @@ export default async function AdminDashboard() {
 
   // Appels API pour récupérer les statistiques réelles
   const requestHeaders = new Headers(await headers());
-  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000';
+  const baseUrl = getBaseUrl();
 
   const apiFetch = (url: string) => fetch(url, { cache: 'no-store', headers: requestHeaders });
 
