@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import JobApplicationSection from '@/components/JobApplicationSection'
-import { getBaseUrl } from '@/lib/api-url'
+import { getBaseUrlFromHeaders } from '@/lib/api-url'
+import { headers } from 'next/headers'
 
 interface JobDetails {
   id: string;
@@ -18,7 +19,8 @@ interface JobDetails {
 
 async function getJobDetails(id: string): Promise<JobDetails | null> {
   try {
-    const baseUrl = getBaseUrl()
+    const headersList = await headers()
+    const baseUrl = getBaseUrlFromHeaders(headersList)
     const response = await fetch(`${baseUrl}/api/jobs/${id}`, {
       cache: 'no-store'
     })

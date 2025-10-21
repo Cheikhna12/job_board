@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { getBaseUrl } from '@/lib/api-url'
+import { getBaseUrlFromHeaders } from '@/lib/api-url'
+import { headers } from 'next/headers'
 
 // Icônes SVG
 const LocationIcon = () => (
@@ -25,7 +26,8 @@ const PlaceholderLogo = ({ letter }: { letter: string }) => (
 
 export default async function CompanyDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const baseUrl = getBaseUrl()
+  const headersList = await headers()
+  const baseUrl = getBaseUrlFromHeaders(headersList)
   const response = await fetch(
     `${baseUrl}/api/companies/${id}`,
     { cache: 'no-store' }
